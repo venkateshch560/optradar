@@ -72,15 +72,15 @@ export default function HomePage() {
                 href="/login"
                 className="rounded-2xl bg-white px-8 py-4 text-lg font-bold text-black shadow-2xl shadow-white/10 transition hover:-translate-y-0.5 hover:bg-gray-200"
               >
-                Start Free
+                Subscribe Now
               </a>
 
               <a
-                href="/dashboard"
-                className="rounded-2xl border border-white/15 bg-white/5 px-8 py-4 text-lg font-semibold backdrop-blur transition hover:-translate-y-0.5 hover:bg-white/10"
-              >
-                View Dashboard
-              </a>
+  href="#dashboard-preview"
+  className="rounded-xl border border-white/10 px-6 py-3 font-semibold text-white hover:bg-white/10"
+>
+  Preview Dashboard
+</a>
             </div>
 
             <div className="mt-10 grid max-w-2xl gap-3 text-sm text-gray-300 sm:grid-cols-2">
@@ -368,7 +368,7 @@ export default function HomePage() {
             href="/login"
             className="mt-10 inline-flex rounded-2xl bg-white px-8 py-4 text-lg font-bold text-black hover:bg-gray-200"
           >
-            Start Free Today
+            Subscribe Now Today
           </a>
         </div>
       </section>
