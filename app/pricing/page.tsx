@@ -1,40 +1,35 @@
 "use client";
-
+import { createClient } from "@supabase/supabase-js";
 export default function PricingPage() {
 
-  async function subscribe() {
+ async function subscribe() {
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
 
-    const email =
-      prompt("Enter your account email");
+  if (!user?.email) {
+    window.location.href = "/login";
+    return;
+  }
 
-    if (!email) return;
+  const res = await fetch("/api/create-checkout-session", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      email: user.email,
+    }),
+  });
 
-    const res =
-      await fetch(
-        "/api/create-checkout-session",
-        {
-          method: "POST",
+  const data = await res.json();
 
-          headers: {
-            "Content-Type":
-              "application/json"
-          },
-
-          body: JSON.stringify({
-            email
-          })
-        }
-      );
-
-    const data = await res.json();
-
-if (data.url) {
-  location.href = data.url;
-} else {
-  alert(data.error || "Stripe session failed");
-  console.log(data);
-}  }
-
+  if (data.url) {
+    window.location.href = data.url;
+  } else {
+    alert(data.error || "Stripe checkout failed");
+  }
+}
   return (
 
     <main className="min-h-screen bg-[#050712] text-white flex items-center justify-center px-6">
