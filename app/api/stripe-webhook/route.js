@@ -27,9 +27,20 @@ export async function POST(req) {
   if (event.type === "checkout.session.completed") {
     const session = event.data.object;
 
-    await supabase.from("subscriptions").upsert(
+    const email =
+      session.customer_email ||
+      session.customer_details?.email;
+
+    if (!email) {
+      return Response.json({
+        received: true,
+        warning: "No customer email found",
+      });
+    }
+
+    const { error } = await supabase.from("subscriptions").upsert(
       {
-        user_email: session.customer_email,
+        user_email: email,
         active: true,
         status: "active",
         stripe_customer_id: session.customer,
@@ -38,40 +49,16 @@ export async function POST(req) {
       },
       { onConflict: "user_email" }
     );
-  }
 
-  if (event.type === "customer.subscription.deleted") {
-    const subscription = event.data.object;
-
-    const { data } = await supabase
-      .from("subscriptions")
-      .select("*")
-      .eq("stripe_subscription_id", subscription.id)
-      .single();
-
-    if (data) {
-      await supabase
-        .from("subscriptions")
-        .update({
-          active: false,
-          status: "cancelled",
-          updated_at: new Date().toISOString(),
-        })
-        .eq("stripe_subscription_id", subscription.id);
+    if (error) {
+      return Response.json(
+        {
+          received: false,
+          error: error.message,
+        },
+        { status: 500 }
+      );
     }
-  }
-
-  if (event.type === "invoice.payment_failed") {
-    const invoice = event.data.object;
-
-    await supabase
-      .from("subscriptions")
-      .update({
-        active: false,
-        status: "payment_failed",
-        updated_at: new Date().toISOString(),
-      })
-      .eq("stripe_customer_id", invoice.customer);
   }
 
   return Response.json({ received: true });
