@@ -254,7 +254,7 @@ if (!subData.active) {
 
   const pageTitle =
     quickFilter === "dashboard"
-      ? `Welcome, ${userName || "Student"}`
+      ? `WELCOME ${userName || "Student"}`
       : navItems.find((item) => item.id === quickFilter)?.label || "Jobs";
 
   return (
