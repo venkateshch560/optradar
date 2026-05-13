@@ -1,7 +1,11 @@
 const features = [
   {
-    title: "Fresh 24h Direct Jobs",
-    desc: "See direct employer openings added recently, not old reposted jobs.",
+    title: "Hourly Fresh Job Updates",
+    desc: "OPT Radar refreshes jobs every hour so students can see newer openings faster.",
+  },
+  {
+    title: "Fresh vs Older Jobs",
+    desc: "Fresh jobs and older jobs are separated so students know where to focus first.",
   },
   {
     title: "OPT Risk Detection",
@@ -12,16 +16,12 @@ const features = [
     desc: "Prioritize jobs based on freshness, risk, role level, and apply path.",
   },
   {
-    title: "Sponsorship Signals",
-    desc: "See whether a role looks low, medium, or high risk for OPT/STEM OPT applicants.",
-  },
-  {
     title: "Direct Apply Links",
     desc: "Skip noisy job boards and go closer to company career pages and ATS links.",
   },
   {
-    title: "Student-Focused Filters",
-    desc: "Filter by entry level, location, remote, role category, and OPT risk.",
+    title: "Saved & Applied Tracker",
+    desc: "Track saved roles and confirmed applications inside one student-focused dashboard.",
   },
 ];
 
@@ -41,13 +41,14 @@ export default function HomePage() {
           <div className="hidden items-center gap-8 text-sm text-gray-300 md:flex">
             <a href="#problem" className="hover:text-white">Why It Works</a>
             <a href="#features" className="hover:text-white">Features</a>
+            <a href="#dashboard-preview" className="hover:text-white">Preview</a>
             <a href="#pricing" className="hover:text-white">Pricing</a>
             <a href="/login" className="hover:text-white">Login</a>
             <a
               href="/login"
               className="rounded-full bg-white px-5 py-2 font-semibold text-black hover:bg-gray-200"
             >
-              Get Started
+              Subscribe Now
             </a>
           </div>
         </nav>
@@ -56,7 +57,7 @@ export default function HomePage() {
           <div>
             <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-blue-400/20 bg-blue-500/10 px-4 py-2 text-sm text-blue-200">
               <span className="h-2 w-2 rounded-full bg-green-400" />
-              Live AI-powered OPT/STEM OPT job intelligence
+              Jobs refresh every hour for active subscribers
             </div>
 
             <h1 className="max-w-4xl text-5xl font-bold leading-[1.05] tracking-tight md:text-7xl">
@@ -64,7 +65,7 @@ export default function HomePage() {
             </h1>
 
             <p className="mt-7 max-w-2xl text-lg leading-8 text-gray-300">
-              OPT Radar filters noisy job boards, removes junk sources, finds fresh direct employer openings, detects OPT risk, and helps students focus on jobs with stronger screening potential.
+              OPT Radar refreshes job opportunities every hour, separates fresh jobs from older postings, filters noisy job-board results, and helps students focus on direct employer opportunities with OPT risk and apply confidence signals.
             </p>
 
             <div className="mt-9 flex flex-wrap gap-4">
@@ -76,11 +77,11 @@ export default function HomePage() {
               </a>
 
               <a
-  href="#dashboard-preview"
-  className="rounded-xl border border-white/10 px-6 py-3 font-semibold text-white hover:bg-white/10"
->
-  Preview Dashboard
-</a>
+                href="#dashboard-preview"
+                className="rounded-2xl border border-white/10 px-8 py-4 text-lg font-semibold text-white hover:bg-white/10"
+              >
+                Preview Dashboard
+              </a>
             </div>
 
             <div className="mt-10 grid max-w-2xl gap-3 text-sm text-gray-300 sm:grid-cols-2">
@@ -88,7 +89,7 @@ export default function HomePage() {
                 ✅ Direct employer & ATS links
               </div>
               <div className="rounded-2xl border border-white/10 bg-white/[0.04] p-4">
-                ⚡ Fresh 24-hour openings
+                ⚡ Hourly job refresh
               </div>
               <div className="rounded-2xl border border-white/10 bg-white/[0.04] p-4">
                 🛡 OPT risk warnings
@@ -106,10 +107,10 @@ export default function HomePage() {
               <div className="mb-5 flex items-center justify-between">
                 <div>
                   <p className="text-sm text-blue-300">Fresh OPT Jobs</p>
-                  <h2 className="text-2xl font-bold">Today’s AI Priority List</h2>
+                  <h2 className="text-2xl font-bold">Hourly Priority List</h2>
                 </div>
                 <div className="rounded-full bg-green-500/15 px-3 py-1 text-sm text-green-300">
-                  Live
+                  Updated hourly
                 </div>
               </div>
 
@@ -152,7 +153,7 @@ export default function HomePage() {
 
               <div className="rounded-2xl border border-blue-500/20 bg-blue-500/10 p-5">
                 <p className="text-sm text-blue-200">
-                  38 fresh low-risk roles found today. Apply before competition increases.
+                  Fresh jobs are updated hourly. Older jobs stay available in the dashboard for later review.
                 </p>
               </div>
             </div>
@@ -204,11 +205,11 @@ export default function HomePage() {
 
               <div className="space-y-4">
                 {[
-                  ["1", "Find fresh job signals", "Tracks direct employer and ATS openings instead of relying on noisy reposts."],
-                  ["2", "Remove junk sources", "Filters out low-quality job boards, duplicate posts, and pay-to-apply sources."],
+                  ["1", "Find fresh job signals", "Refreshes job data hourly and separates fresh listings from older postings."],
+                  ["2", "Remove junk sources", "Filters out low-quality job boards, duplicate posts, and noisy apply paths."],
                   ["3", "Analyze OPT risk", "Scans descriptions for sponsorship risk, clearance language, and citizenship restrictions."],
                   ["4", "Score apply confidence", "Ranks jobs by freshness, direct link quality, OPT risk, role level, and application ease."],
-                  ["5", "Guide next action", "Helps students decide what to apply to first and move toward screening faster."],
+                  ["5", "Guide next action", "Helps students decide what to apply to first and track saved/applied jobs."],
                 ].map(([num, title, desc], index) => (
                   <div key={title} className="relative flex gap-4">
                     <div className="flex flex-col items-center">
@@ -230,10 +231,159 @@ export default function HomePage() {
         </div>
       </section>
 
+      <section id="dashboard-preview" className="border-b border-white/10 bg-[#050712] px-6 py-24 text-white">
+        <div className="mx-auto max-w-7xl">
+          <div className="text-center">
+            <p className="text-sm font-semibold text-blue-300">
+              Premium Dashboard Preview
+            </p>
+
+            <h2 className="mt-3 text-4xl font-bold md:text-5xl">
+              See what students unlock after subscribing
+            </h2>
+
+            <p className="mx-auto mt-5 max-w-3xl text-gray-400">
+              Students get access to a clean job-search command center with fresh jobs,
+              older jobs, saved jobs, applied tracking, OPT risk signals, and apply confidence scoring.
+            </p>
+          </div>
+
+          <div className="mt-12 rounded-[2rem] border border-white/10 bg-[#0B1020] p-6 shadow-2xl">
+            <div className="grid gap-6 lg:grid-cols-[260px_1fr]">
+              <aside className="rounded-3xl border border-white/10 bg-[#070A12] p-5">
+                <h3 className="text-2xl font-bold">OPT Radar</h3>
+                <p className="mt-2 text-sm text-gray-400">
+                  Job Intelligence Platform
+                </p>
+
+                <div className="mt-8 space-y-3">
+                  {[
+                    "Dashboard",
+                    "Fresh Jobs",
+                    "Older Jobs",
+                    "Entry Level",
+                    "Low OPT Risk",
+                    "Saved Jobs",
+                    "Applied Jobs",
+                  ].map((item, index) => (
+                    <div
+                      key={item}
+                      className={
+                        index === 1
+                          ? "rounded-xl bg-white/10 px-4 py-3 font-medium"
+                          : "rounded-xl px-4 py-3 text-gray-400"
+                      }
+                    >
+                      {item}
+                    </div>
+                  ))}
+                </div>
+              </aside>
+
+              <div>
+                <div className="rounded-3xl border border-white/10 bg-gradient-to-br from-[#111827] to-[#070A12] p-8">
+                  <p className="text-sm font-semibold text-blue-300">
+                    OPT / STEM OPT Job Intelligence
+                  </p>
+
+                  <h3 className="mt-3 text-4xl font-bold">
+                    Fresh Jobs Dashboard
+                  </h3>
+
+                  <p className="mt-3 max-w-3xl text-gray-400">
+                    Jobs ranked by freshness, OPT risk, apply confidence, role level,
+                    and direct apply quality.
+                  </p>
+
+                  <div className="mt-8 grid gap-4 md:grid-cols-5">
+                    {[
+                      ["Fresh Jobs", "128"],
+                      ["Older Jobs", "642"],
+                      ["Saved Jobs", "14"],
+                      ["Applied Jobs", "7"],
+                      ["Low OPT Risk", "89"],
+                    ].map(([label, value]) => (
+                      <div
+                        key={label}
+                        className="rounded-2xl border border-white/10 bg-white/5 p-5"
+                      >
+                        <p className="text-sm text-gray-400">{label}</p>
+                        <p className="mt-2 text-3xl font-bold">{value}</p>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                <div className="mt-6 grid gap-4">
+                  {[
+                    {
+                      title: "Junior Data Analyst",
+                      company: "Healthcare Analytics Company",
+                      location: "Remote / United States",
+                      confidence: "86%",
+                      risk: "Low OPT Risk",
+                    },
+                    {
+                      title: "AI Data Analyst",
+                      company: "Enterprise AI Platform",
+                      location: "Austin, TX",
+                      confidence: "78%",
+                      risk: "Medium OPT Risk",
+                    },
+                    {
+                      title: "Cloud Support Engineer",
+                      company: "Technology Services Firm",
+                      location: "Atlanta, GA",
+                      confidence: "82%",
+                      risk: "Low OPT Risk",
+                    },
+                  ].map((job) => (
+                    <div
+                      key={job.title}
+                      className="rounded-2xl border border-white/10 bg-[#0B1020] p-5"
+                    >
+                      <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+                        <div>
+                          <div className="mb-3 flex gap-2">
+                            <span className="rounded-full bg-green-500/15 px-3 py-1 text-xs text-green-300">
+                              Fresh
+                            </span>
+                            <span className="rounded-full bg-blue-500/15 px-3 py-1 text-xs text-blue-300">
+                              Direct Employer
+                            </span>
+                            <span className="rounded-full bg-yellow-500/15 px-3 py-1 text-xs text-yellow-300">
+                              {job.risk}
+                            </span>
+                          </div>
+
+                          <h4 className="text-xl font-bold">{job.title}</h4>
+                          <p className="mt-1 text-gray-400">
+                            {job.company} • {job.location}
+                          </p>
+                        </div>
+
+                        <div className="rounded-2xl border border-green-500/20 bg-green-500/10 p-4 text-center text-green-300">
+                          <p className="text-sm">Apply Confidence</p>
+                          <p className="text-3xl font-bold">{job.confidence}</p>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+
+                <p className="mt-5 text-center text-sm text-gray-500">
+                  Preview only. Full dashboard access is available after subscription.
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
       <section className="border-b border-white/10 bg-[#080B16]">
         <div className="mx-auto grid max-w-7xl gap-4 px-6 py-10 md:grid-cols-4">
           {[
-            ["Fresh roles", "500+"],
+            ["Fresh jobs", "Hourly"],
             ["Job sources", "Direct ATS"],
             ["Risk checks", "AI-assisted"],
             ["Built for", "OPT/STEM"],
@@ -314,13 +464,13 @@ export default function HomePage() {
           <div className="grid gap-4 md:grid-cols-2">
             {[
               "Unlimited fresh OPT/STEM OPT jobs",
+              "Hourly job updates",
               "Direct employer & ATS links",
               "AI apply confidence scoring",
               "OPT risk detection",
               "Sponsorship insights",
-              "Priority fresh-job visibility",
-              "Advanced dashboard filters",
-              "Future resume matching upgrades",
+              "Saved and applied tracker",
+              "Hourly email job alerts",
             ].map((item) => (
               <div
                 key={item}
@@ -346,7 +496,7 @@ export default function HomePage() {
             href="/login"
             className="mt-10 block rounded-2xl bg-white px-5 py-5 text-center text-2xl font-bold text-black transition hover:bg-gray-200"
           >
-            Try OPT Radar Today
+            Subscribe Now
           </a>
 
           <p className="mt-6 text-center text-sm leading-7 text-gray-500">
@@ -368,50 +518,38 @@ export default function HomePage() {
             href="/login"
             className="mt-10 inline-flex rounded-2xl bg-white px-8 py-4 text-lg font-bold text-black hover:bg-gray-200"
           >
-            Subscribe Now Today
+            Subscribe Now
           </a>
         </div>
       </section>
+
       <footer className="border-t border-white/10 py-10 text-center text-sm text-gray-500">
+        <p>
+          OPT Radar is a job intelligence and aggregation platform that helps users discover publicly available job openings faster.
+        </p>
 
-  <p>
-    OPT Radar is a job intelligence and aggregation platform that helps users discover publicly available job openings faster.
-  </p>
+        <p className="mt-3">
+          We do not guarantee interviews, sponsorship, employment, callbacks, or hiring outcomes.
+        </p>
 
-  <p className="mt-3">
-    We do not guarantee interviews, sponsorship, employment, callbacks, or hiring outcomes.
-  </p>
+        <div className="mt-5 flex items-center justify-center gap-6">
+          <a href="/terms" className="hover:text-white">
+            Terms
+          </a>
 
-  <div className="mt-5 flex items-center justify-center gap-6">
+          <a href="/privacy" className="hover:text-white">
+            Privacy
+          </a>
 
-    <a
-      href="/terms"
-      className="hover:text-white"
-    >
-      Terms
-    </a>
+          <a href="/disclaimer" className="hover:text-white">
+            Disclaimer
+          </a>
+        </div>
 
-    <a
-      href="/privacy"
-      className="hover:text-white"
-    >
-      Privacy
-    </a>
-
-    <a
-      href="/disclaimer"
-      className="hover:text-white"
-    >
-      Disclaimer
-    </a>
-
-  </div>
-
-  <p className="mt-6 text-xs text-gray-600">
-    © 2026 OPT Radar by The AI Solutionist
-  </p>
-
-</footer>
+        <p className="mt-6 text-xs text-gray-600">
+          © 2026 OPT Radar by The AI Solutionist
+        </p>
+      </footer>
     </main>
   );
 }
