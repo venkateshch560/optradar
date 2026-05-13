@@ -545,7 +545,15 @@ export default function HomePage() {
             Disclaimer
           </a>
         </div>
-
+<p className="mt-5">
+  Support:{" "}
+  <a
+    href="mailto:support@theaisolutionist.com"
+    className="text-blue-300 hover:text-white"
+  >
+    support@theaisolutionist.com
+  </a>
+</p>
         <p className="mt-6 text-xs text-gray-600">
           © 2026 OPT Radar by The AI Solutionist
         </p>
