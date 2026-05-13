@@ -11,7 +11,8 @@ const supabase = createClient(
 export default function LoginPage() {
   const [isSignup, setIsSignup] = useState(false);
 
-  const [fullName, setFullName] = useState("");
+  const [firstName, setFirstName] = useState("");
+  const [lastName, setLastName] = useState("");
   const [phone, setPhone] = useState("");
 
   const [email, setEmail] = useState("");
@@ -38,8 +39,12 @@ export default function LoginPage() {
   }
 
   async function handleSignup() {
+    const cleanEmail = email.trim().toLowerCase();
+    const cleanFirstName = firstName.trim();
+    const cleanLastName = lastName.trim();
+
     const { error } = await supabase.auth.signUp({
-      email,
+      email: cleanEmail,
       password,
     });
 
@@ -48,20 +53,31 @@ export default function LoginPage() {
       return;
     }
 
-    await supabase.from("profiles").upsert({
-      email,
-      full_name: fullName,
-      phone,
+    const { error: profileError } = await supabase.from("profiles").upsert({
+      email: cleanEmail,
+      first_name: cleanFirstName,
+      last_name: cleanLastName,
+      full_name: `${cleanFirstName} ${cleanLastName}`.trim(),
+      phone: phone.trim(),
     });
 
-    alert("Account created successfully. Please complete payment to access dashboard.");
+    if (profileError) {
+      alert("Profile save failed: " + profileError.message);
+      return;
+    }
+
+    alert(
+      "Account created successfully. Please complete payment to access dashboard."
+    );
 
     window.location.href = "/pricing";
   }
 
   async function handleLogin() {
+    const cleanEmail = email.trim().toLowerCase();
+
     const { error } = await supabase.auth.signInWithPassword({
-      email,
+      email: cleanEmail,
       password,
     });
 
@@ -70,7 +86,7 @@ export default function LoginPage() {
       return;
     }
 
-    await checkSubscriptionAndRedirect(email);
+    await checkSubscriptionAndRedirect(cleanEmail);
   }
 
   return (
@@ -83,17 +99,27 @@ export default function LoginPage() {
         </h1>
 
         <p className="mt-3 text-gray-400">
-          Fresh OPT jobs, sponsorship insights, AI-powered tracking.
+          Fresh OPT jobs, hourly updates, sponsorship insights, and premium job
+          tracking.
         </p>
 
         {isSignup && (
           <>
-            <input
-              className="mt-6 w-full rounded-xl bg-white/5 border border-white/10 p-3 outline-none"
-              placeholder="Full Name"
-              value={fullName}
-              onChange={(e) => setFullName(e.target.value)}
-            />
+            <div className="mt-6 grid grid-cols-2 gap-3">
+              <input
+                className="w-full rounded-xl bg-white/5 border border-white/10 p-3 outline-none"
+                placeholder="First Name"
+                value={firstName}
+                onChange={(e) => setFirstName(e.target.value)}
+              />
+
+              <input
+                className="w-full rounded-xl bg-white/5 border border-white/10 p-3 outline-none"
+                placeholder="Last Name"
+                value={lastName}
+                onChange={(e) => setLastName(e.target.value)}
+              />
+            </div>
 
             <input
               className="mt-3 w-full rounded-xl bg-white/5 border border-white/10 p-3 outline-none"
