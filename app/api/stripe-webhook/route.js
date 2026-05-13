@@ -68,3 +68,7 @@ if (error) {
 }
 
 console.log("WEBHOOK SUCCESS:", data);
+      }
+
+  return Response.json({ received: true });
+}
