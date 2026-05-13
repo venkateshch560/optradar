@@ -69,11 +69,13 @@ if (!subData.active) {
         .eq("email", user.email)
         .single();
 
-      if (profile?.full_name) {
-        setUserName(profile.full_name);
-      } else {
-        setUserName((user.email || "Student").split("@")[0]);
-      }
+     if (profile?.first_name) {
+  setUserName(profile.first_name.toUpperCase());
+} else if (profile?.full_name) {
+  setUserName(profile.full_name.split(" ")[0].toUpperCase());
+} else {
+  setUserName((user.email || "STUDENT").split("@")[0].toUpperCase());
+}
 
       setSavedIds(
         savedJobs
