@@ -17,8 +17,28 @@ export default function LoginPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
+  async function checkSubscriptionAndRedirect(userEmail: string) {
+    const res = await fetch("/api/check-subscription", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        email: userEmail,
+      }),
+    });
+
+    const data = await res.json();
+
+    if (data.active) {
+      window.location.href = "/dashboard";
+    } else {
+      window.location.href = "/pricing";
+    }
+  }
+
   async function handleSignup() {
-    const { data, error } = await supabase.auth.signUp({
+    const { error } = await supabase.auth.signUp({
       email,
       password,
     });
@@ -28,15 +48,15 @@ export default function LoginPage() {
       return;
     }
 
-    await supabase.from("profiles").insert({
+    await supabase.from("profiles").upsert({
       email,
       full_name: fullName,
       phone,
     });
 
-    alert("Account created successfully");
+    alert("Account created successfully. Please complete payment to access dashboard.");
 
-    window.location.href = "/dashboard";
+    window.location.href = "/pricing";
   }
 
   async function handleLogin() {
@@ -50,7 +70,7 @@ export default function LoginPage() {
       return;
     }
 
-    window.location.href = "/dashboard";
+    await checkSubscriptionAndRedirect(email);
   }
 
   return (
@@ -103,7 +123,7 @@ export default function LoginPage() {
           onClick={isSignup ? handleSignup : handleLogin}
           className="mt-6 w-full rounded-xl bg-white text-black font-bold p-3 hover:bg-gray-200"
         >
-          {isSignup ? "Create Account" : "Login"}
+          {isSignup ? "Create Account & Continue to Payment" : "Login"}
         </button>
 
         <button
@@ -120,8 +140,8 @@ export default function LoginPage() {
             ← Back to Home
           </a>
 
-          <a href="/dashboard" className="hover:text-white">
-            Dashboard →
+          <a href="/pricing" className="hover:text-white">
+            Pricing →
           </a>
         </div>
       </div>
