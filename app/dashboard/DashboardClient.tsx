@@ -45,6 +45,23 @@ export default function DashboardClient({
       }
 
       setUserEmail(user.email || "");
+      
+      const subRes = await fetch("/api/check-subscription", {
+  method: "POST",
+  headers: {
+    "Content-Type": "application/json",
+  },
+  body: JSON.stringify({
+    email: user.email,
+  }),
+});
+
+const subData = await subRes.json();
+
+if (!subData.active) {
+  window.location.href = "/pricing";
+  return;
+}
 
       const { data: profile } = await supabase
         .from("profiles")
