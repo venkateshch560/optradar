@@ -9,85 +9,80 @@ const supabase = createClient(
 );
 
 export async function GET(req) {
-  const auth = req.headers.get("authorization");
+  try {
+    const authHeader = req.headers.get("authorization");
 
-  if (auth !== `Bearer ${process.env.CRON_SECRET}`) {
-    return Response.json({ error: "Unauthorized" }, { status: 401 });
-  }
+    if (authHeader !== `Bearer ${process.env.CRON_SECRET}`) {
+      return Response.json(
+        { error: "Unauthorized" },
+        { status: 401 }
+      );
+    }
 
-  const since = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString();
+    const oneHourAgo = new Date(
+      Date.now() - 60 * 60 * 1000
+    ).toISOString();
 
-  const { data: jobs, error: jobsError } = await supabase
-    .from("jobs")
-    .select("*")
-    .gte("posted_at", since)
-    .order("posted_at", { ascending: false })
-    .limit(10);
+    const { data: jobs } = await supabase
+      .from("jobs")
+      .select("*")
+      .gte("created_at", oneHourAgo)
+      .limit(20);
 
-  if (jobsError) {
-    return Response.json({ success: false, error: jobsError.message }, { status: 500 });
-  }
+    if (!jobs || jobs.length === 0) {
+      return Response.json({
+        success: true,
+        message: "No new jobs",
+      });
+    }
 
-  const { data: users, error: usersError } = await supabase
-    .from("subscriptions")
-    .select("user_email, active")
-    .eq("active", true);
+    const { data: subscribers } = await supabase
+      .from("subscriptions")
+      .select("*")
+      .eq("active", true)
+      .eq("email_alerts", true);
 
-  if (usersError) {
-    return Response.json({ success: false, error: usersError.message }, { status: 500 });
-  }
+    for (const user of subscribers || []) {
+      const jobsHtml = jobs
+        .map(
+          (job) => `
+            <div style="margin-bottom:20px;padding:16px;border:1px solid #ddd;border-radius:10px;">
+              <h2>${job.title}</h2>
+              <p><strong>${job.company}</strong></p>
+              <p>${job.location || "Remote"}</p>
+              <a href="${job.apply_link}" target="_blank">
+                Apply Now
+              </a>
+            </div>
+          `
+        )
+        .join("");
 
-  if (!jobs || jobs.length === 0) {
+      await resend.emails.send({
+        from: process.env.ALERT_FROM_EMAIL,
+        to: user.user_email,
+        subject: "🚀 Fresh OPT Jobs - OPT Radar",
+        html: `
+          <div style="font-family:sans-serif;">
+            <h1>Fresh OPT Jobs</h1>
+            <p>Here are the latest jobs posted in the last hour.</p>
+            ${jobsHtml}
+          </div>
+        `,
+      });
+    }
+
     return Response.json({
       success: true,
-      message: "No fresh jobs to send",
+      emails_sent: subscribers?.length || 0,
     });
+  } catch (err) {
+    return Response.json(
+      {
+        success: false,
+        error: err.message,
+      },
+      { status: 500 }
+    );
   }
-
-  let sent = 0;
-
-  for (const user of users || []) {
-    const jobHtml = jobs
-      .map(
-        (job) => `
-          <div style="border:1px solid #e5e7eb;border-radius:12px;padding:16px;margin-bottom:12px;">
-            <h3 style="margin:0 0 6px 0;">${job.title || "Untitled Job"}</h3>
-            <p style="margin:0 0 8px 0;color:#4b5563;">${job.company || ""} • ${job.location || ""}</p>
-            <p style="margin:0 0 8px 0;color:#4b5563;">
-              OPT Risk: ${job.opt_risk_level || "Unknown"} • Confidence: ${job.apply_confidence || 50}%
-            </p>
-            <a href="${job.apply_link}" style="display:inline-block;background:#111827;color:white;padding:10px 14px;border-radius:8px;text-decoration:none;">
-              Apply Direct
-            </a>
-          </div>
-        `
-      )
-      .join("");
-
-    await resend.emails.send({
-      from: process.env.ALERT_FROM_EMAIL,
-      to: user.user_email,
-      subject: `${jobs.length} fresh OPT/STEM OPT jobs found today`,
-      html: `
-        <div style="font-family:Arial,sans-serif;max-width:680px;margin:0 auto;padding:24px;">
-          <h1>Fresh OPT Jobs Today</h1>
-          <p style="color:#4b5563;">
-            Here are fresh direct job openings found in the last 24 hours.
-          </p>
-          ${jobHtml}
-          <p style="font-size:12px;color:#6b7280;margin-top:24px;">
-            OPT Radar helps organize public job openings. We do not guarantee interviews, sponsorship, or employment.
-          </p>
-        </div>
-      `,
-    });
-
-    sent++;
-  }
-
-  return Response.json({
-    success: true,
-    sent,
-    jobs: jobs.length,
-  });
 }
