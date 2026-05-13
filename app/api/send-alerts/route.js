@@ -13,21 +13,20 @@ export async function GET(req) {
     const authHeader = req.headers.get("authorization");
 
     if (authHeader !== `Bearer ${process.env.CRON_SECRET}`) {
-      return Response.json(
-        { error: "Unauthorized" },
-        { status: 401 }
-      );
+      return Response.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const oneHourAgo = new Date(
-      Date.now() - 60 * 60 * 1000
-    ).toISOString();
+    const oneHourAgo = new Date(Date.now() - 60 * 60 * 1000).toISOString();
 
-    const { data: jobs } = await supabase
+    const { data: jobs, error: jobsError } = await supabase
       .from("jobs")
       .select("*")
       .gte("created_at", oneHourAgo)
       .limit(20);
+
+    if (jobsError) {
+      throw jobsError;
+    }
 
     if (!jobs || jobs.length === 0) {
       return Response.json({
@@ -36,21 +35,28 @@ export async function GET(req) {
       });
     }
 
-    const { data: subscribers } = await supabase
+    const { data: subscribers, error: subscribersError } = await supabase
       .from("subscriptions")
       .select("*")
       .eq("active", true)
       .eq("email_alerts", true);
+
+    if (subscribersError) {
+      throw subscribersError;
+    }
 
     for (const user of subscribers || []) {
       const jobsHtml = jobs
         .map(
           (job) => `
             <div style="margin-bottom:20px;padding:16px;border:1px solid #ddd;border-radius:10px;">
-              <h2>${job.title}</h2>
-              <p><strong>${job.company}</strong></p>
-              <p>${job.location || "Remote"}</p>
-              <a href="${job.apply_link}" target="_blank">
+              <h2>${job.title || "Untitled Job"}</h2>
+              <p><strong>${job.company || "Unknown Company"}</strong></p>
+              <p>${job.location || "Remote / Not listed"}</p>
+              <p>OPT Risk: ${job.opt_risk_level || "Unknown"} | Confidence: ${
+                job.apply_confidence || 50
+              }%</p>
+              <a href="${job.apply_link || "https://jobs.theaisolutionist.com/dashboard"}" target="_blank">
                 Apply Now
               </a>
             </div>
@@ -61,30 +67,29 @@ export async function GET(req) {
       await resend.emails.send({
         from: process.env.ALERT_FROM_EMAIL,
         to: user.user_email,
-        subject: "🚀 Fresh OPT Jobs - OPT Radar",
+        subject: "Fresh OPT Jobs - OPT Radar",
         html: `
-  <div style="font-family:sans-serif;max-width:680px;margin:0 auto;padding:20px;">
-    <h1>Fresh OPT Jobs</h1>
+          <div style="font-family:sans-serif;max-width:680px;margin:0 auto;padding:20px;">
+            <h1>Fresh OPT Jobs</h1>
 
-    <p>
-      Here are the latest jobs posted in the last hour.
-    </p>
+            <p>
+              Here are the latest jobs posted in the last hour.
+            </p>
 
-    ${jobsHtml}
+            ${jobsHtml}
 
-    <hr style="margin-top:30px;" />
+            <hr style="margin-top:30px;" />
 
-    <p style="font-size:12px;color:#777;">
-      You're receiving this because you're subscribed to OPT Radar.
-      <br /><br />
+            <p style="font-size:12px;color:#777;">
+              You're receiving this because you're subscribed to OPT Radar.
+              <br /><br />
 
-      <a href="https://jobs.theaisolutionist.com/api/unsubscribe?email=${user.user_email}">
-        Unsubscribe
-      </a>
-    </p>
-  </div>
-`,
-        `
+              <a href="https://jobs.theaisolutionist.com/api/unsubscribe?email=${user.user_email}">
+                Unsubscribe
+              </a>
+            </p>
+          </div>
+        `,
       });
     }
 
