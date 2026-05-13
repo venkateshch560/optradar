@@ -63,12 +63,28 @@ export async function GET(req) {
         to: user.user_email,
         subject: "🚀 Fresh OPT Jobs - OPT Radar",
         html: `
-          <div style="font-family:sans-serif;">
-            <h1>Fresh OPT Jobs</h1>
-            <p>Here are the latest jobs posted in the last hour.</p>
-            ${jobsHtml}
-          </div>
-        `,
+  <div style="font-family:sans-serif;max-width:680px;margin:0 auto;padding:20px;">
+    <h1>Fresh OPT Jobs</h1>
+
+    <p>
+      Here are the latest jobs posted in the last hour.
+    </p>
+
+    ${jobsHtml}
+
+    <hr style="margin-top:30px;" />
+
+    <p style="font-size:12px;color:#777;">
+      You're receiving this because you're subscribed to OPT Radar.
+      <br /><br />
+
+      <a href="https://jobs.theaisolutionist.com/api/unsubscribe?email=${user.user_email}">
+        Unsubscribe
+      </a>
+    </p>
+  </div>
+`,
+        `
       });
     }
 
