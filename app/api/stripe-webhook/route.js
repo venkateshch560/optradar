@@ -38,28 +38,33 @@ export async function POST(req) {
       });
     }
 
-    const { error } = await supabase.from("subscriptions").upsert(
-      {
-        user_email: email,
-        active: true,
-        status: "active",
-        stripe_customer_id: session.customer,
-        stripe_subscription_id: session.subscription,
-        updated_at: new Date().toISOString(),
-      },
-      { onConflict: "user_email" }
-    );
-
-    if (error) {
-      return Response.json(
-        {
-          received: false,
-          error: error.message,
-        },
-        { status: 500 }
-      );
+    const { data, error } = await supabase
+  .from("subscriptions")
+  .upsert(
+    {
+      user_email: email,
+      active: true,
+      status: "active",
+      stripe_customer_id: String(session.customer || ""),
+      stripe_subscription_id: String(session.subscription || ""),
+      updated_at: new Date().toISOString(),
+    },
+    {
+      onConflict: "user_email",
     }
-  }
+  )
+  .select();
 
-  return Response.json({ received: true });
+if (error) {
+  console.log("SUPABASE WEBHOOK ERROR:", error);
+
+  return Response.json(
+    {
+      received: false,
+      error: error.message,
+    },
+    { status: 500 }
+  );
 }
+
+console.log("WEBHOOK SUCCESS:", data);
