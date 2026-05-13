@@ -10,11 +10,12 @@ const supabase = createClient(
 
 export async function GET(req) {
   try {
-    const authHeader = req.headers.get("authorization");
+    const { searchParams } = new URL(req.url);
+const secret = searchParams.get("secret");
 
-    if (authHeader !== `Bearer ${process.env.CRON_SECRET}`) {
-      return Response.json({ error: "Unauthorized" }, { status: 401 });
-    }
+if (secret !== process.env.CRON_SECRET) {
+  return Response.json({ error: "Unauthorized" }, { status: 401 });
+}
 
     const oneHourAgo = new Date(Date.now() - 60 * 60 * 1000).toISOString();
 
