@@ -3,6 +3,10 @@
     {
       "path": "/api/fetch-jobs",
       "schedule": "0 * * * *"
+    },
+    {
+      "path": "/api/send-alerts",
+      "schedule": "5 * * * *"
     }
   ]
 }
