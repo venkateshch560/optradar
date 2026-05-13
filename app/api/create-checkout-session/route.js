@@ -16,7 +16,7 @@ export async function POST(req) {
           quantity: 1,
         },
       ],
-      success_url: "https://jobs.theaisolutionist.com/dashboard",
+      success_url: "https://jobs.theaisolutionist.com/payment-success",
       cancel_url: "https://jobs.theaisolutionist.com/pricing",
     });
 
