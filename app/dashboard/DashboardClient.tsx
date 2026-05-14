@@ -2,6 +2,21 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { createClient } from "@supabase/supabase-js";
+import {
+  Home,
+  Clock3,
+  FolderOpen,
+  GraduationCap,
+  MapPin,
+  ShieldCheck,
+  Sparkles,
+  Heart,
+  Send,
+  LogOut,
+  RotateCcw,
+  Bookmark,
+  FileText,
+} from "lucide-react";
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -30,14 +45,17 @@ export default function DashboardClient({
   const [userName, setUserName] = useState("");
   const [savedIds, setSavedIds] = useState<any[]>([]);
   const [appliedIds, setAppliedIds] = useState<any[]>([]);
+  const [currentPage, setCurrentPage] = useState(1);
+
+  const jobsPerPage = 20;
+
   const [lastRefreshed] = useState(
     new Date().toLocaleTimeString([], {
       hour: "2-digit",
       minute: "2-digit",
     })
   );
-const [currentPage, setCurrentPage] = useState(1);
-const jobsPerPage = 20;
+
   const safeJobs = jobs || [];
   const now = Date.now();
 
@@ -123,6 +141,10 @@ const jobsPerPage = 20;
   }, [savedJobs, appliedJobs]);
 
   useEffect(() => {
+    setCurrentPage(1);
+  }, [quickFilter, title, location, experience, category, risk, view]);
+
+  useEffect(() => {
     function handleFocus() {
       const saved = localStorage.getItem("lastOpenedJob");
       if (!saved) return;
@@ -184,13 +206,10 @@ const jobsPerPage = 20;
 
   const stats = useMemo(() => {
     return {
-      total: safeJobs.length,
       fresh: safeJobs.filter((job) => isFreshJob(job)).length,
       archive: safeJobs.filter((job) => !isFreshJob(job)).length,
       saved: savedIds.length,
       applied: appliedIds.length,
-      strong: safeJobs.filter((job) => (job.apply_confidence || 50) >= 75)
-        .length,
       lowRisk: safeJobs.filter((job) => job.opt_risk_level === "Low Risk")
         .length,
     };
@@ -229,18 +248,14 @@ const jobsPerPage = 20;
 
     return true;
   });
-const totalPages = Math.ceil(filteredJobs.length / jobsPerPage);
 
-const paginatedJobs = filteredJobs.slice(
-  (currentPage - 1) * jobsPerPage,
-  currentPage * jobsPerPage
-);
-  useEffect(() => {
-  setCurrentPage(1);
-}, [quickFilter, title, location, experience, category, risk, view]);
-  useEffect(() => {
-  setCurrentPage(1);
-}, [quickFilter, title, location, experience, category, risk, view]);
+  const totalPages = Math.ceil(filteredJobs.length / jobsPerPage);
+
+  const paginatedJobs = filteredJobs.slice(
+    (currentPage - 1) * jobsPerPage,
+    currentPage * jobsPerPage
+  );
+
   function resetFilters() {
     setTitle("");
     setLocation("");
@@ -249,6 +264,15 @@ const paginatedJobs = filteredJobs.slice(
     setRisk("");
     setView("all");
     setQuickFilter("dashboard");
+  }
+
+  function resetOnlyFilters() {
+    setTitle("");
+    setLocation("");
+    setExperience("");
+    setCategory("");
+    setRisk("");
+    setView("all");
   }
 
   function formatDate(date: string) {
@@ -277,6 +301,17 @@ const paginatedJobs = filteredJobs.slice(
     return "bg-gray-500/15 text-gray-300";
   }
 
+  function riskLabel(level: string) {
+    if (level === "Medium Risk") return "Review Needed";
+    return level || "OPT Risk Unknown";
+  }
+
+  function confidenceLabel(score: number) {
+    if (score >= 90) return "Strong Match";
+    if (score >= 70) return "Good Match";
+    return "Medium Match";
+  }
+
   function experienceText(job: any) {
     if (
       !job.experience_level ||
@@ -296,15 +331,15 @@ const paginatedJobs = filteredJobs.slice(
   }
 
   const navItems = [
-    { id: "dashboard", label: "Dashboard" },
-    { id: "fresh", label: "Fresh Jobs" },
-    { id: "archive", label: "All Jobs" },
-    { id: "entry", label: "Entry Level" },
-    { id: "remote", label: "Remote Jobs" },
-    { id: "lowrisk", label: "Low-Risk Jobs" },
-    { id: "strong", label: "Top Matches" },
-    { id: "saved", label: "Saved Jobs" },
-    { id: "applied", label: "Applied Jobs" },
+    { id: "dashboard", label: "Dashboard", icon: Home },
+    { id: "fresh", label: "Fresh Jobs", icon: Clock3 },
+    { id: "archive", label: "All Jobs", icon: FolderOpen },
+    { id: "entry", label: "Entry Level", icon: GraduationCap },
+    { id: "remote", label: "Remote Jobs", icon: MapPin },
+    { id: "lowrisk", label: "Low-Risk Jobs", icon: ShieldCheck },
+    { id: "strong", label: "Top Matches", icon: Sparkles },
+    { id: "saved", label: "Saved Jobs", icon: Heart },
+    { id: "applied", label: "Applied Jobs", icon: Send },
   ];
 
   const pageTitle =
@@ -340,25 +375,31 @@ const paginatedJobs = filteredJobs.slice(
           </div>
 
           <nav className="mt-8 space-y-2">
-            {navItems.map((item) => (
-              <button
-                key={item.id}
-                onClick={() => setQuickFilter(item.id)}
-                className={
-                  quickFilter === item.id
-                    ? "w-full rounded-xl bg-white/10 px-4 py-3 text-left font-medium"
-                    : "w-full rounded-xl px-4 py-3 text-left text-gray-300 hover:bg-white/5"
-                }
-              >
-                {item.label}
-              </button>
-            ))}
+            {navItems.map((item) => {
+              const Icon = item.icon;
+
+              return (
+                <button
+                  key={item.id}
+                  onClick={() => setQuickFilter(item.id)}
+                  className={
+                    quickFilter === item.id
+                      ? "flex w-full items-center gap-3 rounded-xl bg-blue-500/15 px-4 py-3 text-left font-medium text-white"
+                      : "flex w-full items-center gap-3 rounded-xl px-4 py-3 text-left text-gray-300 hover:bg-white/5 hover:text-white"
+                  }
+                >
+                  <Icon className="h-5 w-5" />
+                  {item.label}
+                </button>
+              );
+            })}
           </nav>
 
           <button
             onClick={logout}
-            className="mt-10 w-full rounded-xl border border-white/10 px-4 py-3 text-gray-300 hover:bg-white/5"
+            className="mt-10 flex w-full items-center justify-center gap-2 rounded-xl border border-white/10 px-4 py-3 text-gray-300 hover:bg-white/5"
           >
+            <LogOut className="h-5 w-5" />
             Logout
           </button>
         </aside>
@@ -377,9 +418,9 @@ const paginatedJobs = filteredJobs.slice(
                   </h1>
 
                   <p className="mt-4 max-w-3xl text-lg leading-8 text-gray-400">
-                    Hourly-updated OPT/STEM OPT opportunities with company
-                    career links, apply confidence scoring, low-risk filtering,
-                    and application tracking.
+                    Hourly-updated OPT/STEM OPT opportunities with official
+                    company career links, apply confidence scoring, low-risk
+                    filtering, and application tracking.
                   </p>
 
                   <div className="mt-5 flex flex-wrap gap-3">
@@ -389,7 +430,7 @@ const paginatedJobs = filteredJobs.slice(
                     </div>
 
                     <div className="inline-flex items-center gap-2 rounded-full border border-blue-500/20 bg-blue-500/10 px-4 py-2 text-sm text-blue-300">
-                      Last refreshed: {lastRefreshed}
+                      Last updated: {lastRefreshed}
                     </div>
                   </div>
                 </div>
@@ -411,44 +452,48 @@ const paginatedJobs = filteredJobs.slice(
                 </div>
               </div>
 
-              <div className="mt-8 grid gap-4 sm:grid-cols-2 xl:grid-cols-7">
+              <div className="mt-8 grid gap-4 sm:grid-cols-2 xl:grid-cols-6">
                 {[
-                  ["Fresh Jobs", stats.fresh],
-                  ["All Jobs", stats.archive],
-                  ["Saved Jobs", stats.saved],
-                  ["Applied Jobs", stats.applied],
-                  ["Low OPT Risk", stats.lowRisk],
-                ].map(([label, value]) => (
+                  ["Fresh Jobs", stats.fresh, Clock3],
+                  ["All Jobs", stats.archive, FolderOpen],
+                  ["Saved Jobs", stats.saved, Bookmark],
+                  ["Applied Jobs", stats.applied, Send],
+                  ["Low OPT Risk", stats.lowRisk, ShieldCheck],
+                ].map(([label, value, Icon]: any) => (
                   <div
                     key={label}
                     className="rounded-3xl border border-white/10 bg-gradient-to-br from-white/[0.07] to-white/[0.02] p-5 shadow-xl"
                   >
-                    <p className="text-sm text-gray-400">{label}</p>
-                    <p className="mt-2 text-3xl font-bold">{value}</p>
+                    <div className="mb-3 flex items-center gap-3">
+                      <Icon className="h-5 w-5 text-blue-300" />
+                      <p className="text-sm text-gray-400">{label}</p>
+                    </div>
+
+                    <p className="text-3xl font-bold">{value}</p>
                   </div>
                 ))}
 
-                <div className="rounded-2xl border border-green-500/20 bg-green-500/10 p-5">
+                <div className="rounded-3xl border border-green-500/20 bg-green-500/10 p-5 shadow-xl">
                   <p className="text-sm text-green-300">Subscription</p>
-                  <p className="mt-2 text-3xl font-bold text-green-300">
+                  <p className="mt-2 text-2xl font-bold text-green-300">
                     ACTIVE
                   </p>
                 </div>
               </div>
 
-              <div className="mt-6 rounded-2xl border border-white/10 bg-[#0B1020]/80 p-5">
+              <div className="mt-6 rounded-3xl border border-white/10 bg-[#0B1020]/80 p-5 shadow-xl">
                 <h3 className="text-lg font-bold">Apply Confidence Guide</h3>
 
                 <div className="mt-4 grid gap-3 md:grid-cols-3">
-                  <div className="rounded-xl bg-green-500/10 p-4 text-green-300">
+                  <div className="rounded-2xl bg-green-500/10 p-4 text-green-300">
                     90%+ → Strong Match
                   </div>
 
-                  <div className="rounded-xl bg-yellow-500/10 p-4 text-yellow-300">
+                  <div className="rounded-2xl bg-yellow-500/10 p-4 text-yellow-300">
                     70–89% → Good Match
                   </div>
 
-                  <div className="rounded-xl bg-red-500/10 p-4 text-red-300">
+                  <div className="rounded-2xl bg-red-500/10 p-4 text-red-300">
                     Below 70% → Medium Match
                   </div>
                 </div>
@@ -465,9 +510,9 @@ const paginatedJobs = filteredJobs.slice(
                   </h2>
 
                   <p className="mt-4 text-gray-400 leading-7">
-                    Start with Fresh Jobs, save roles you like, apply directly,
-                    and when you return, OPT Radar will ask whether you applied
-                    and move it into Applied Jobs.
+                    Start with Fresh Jobs, save roles you like, apply on the
+                    company site, and when you return, OPT Radar will ask
+                    whether you applied and move it into Applied Jobs.
                   </p>
 
                   <div className="mt-8 grid gap-4 md:grid-cols-2">
@@ -488,10 +533,10 @@ const paginatedJobs = filteredJobs.slice(
                       className="rounded-2xl border border-gray-500/20 bg-gray-500/10 p-6 text-left hover:bg-gray-500/20"
                     >
                       <p className="text-xl font-bold text-gray-300">
-                        Archive Jobs
+                        All Jobs
                       </p>
                       <p className="mt-2 text-sm text-gray-300">
-                        Jobs older than 24 hours for later review.
+                        Older roles and complete job database for later review.
                       </p>
                     </button>
 
@@ -527,7 +572,7 @@ const paginatedJobs = filteredJobs.slice(
                   <div className="mt-6 space-y-4 text-gray-300">
                     <p>1. Open Fresh Jobs.</p>
                     <p>2. Save jobs you like.</p>
-                    <p>3. Click Apply Direct.</p>
+                    <p>3. Click Apply on Company Site.</p>
                     <p>4. Return and confirm if you applied.</p>
                     <p>5. Track everything in Saved and Applied Jobs.</p>
                   </div>
@@ -535,7 +580,7 @@ const paginatedJobs = filteredJobs.slice(
               </div>
             ) : (
               <>
-                <div className="mb-6 rounded-2xl border border-white/10 bg-[#0B1020] p-5 shadow-xl">
+                <div className="mb-6 rounded-3xl border border-white/10 bg-[#0B1020]/70 p-4 shadow-2xl backdrop-blur">
                   <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-7">
                     <input
                       className="rounded-xl border border-white/10 bg-white/5 p-3 outline-none placeholder:text-gray-500"
@@ -584,6 +629,7 @@ const paginatedJobs = filteredJobs.slice(
                       <option value="Project / Operations">
                         Project / Operations
                       </option>
+                      <option value="Cybersecurity">Cybersecurity</option>
                       <option value="Other">Other</option>
                     </select>
 
@@ -594,7 +640,7 @@ const paginatedJobs = filteredJobs.slice(
                     >
                       <option value="">All OPT Risk</option>
                       <option value="Low Risk">Low Risk</option>
-                      <option value="Medium Risk">Medium Risk</option>
+                      <option value="Medium Risk">Review Needed</option>
                       <option value="High Risk">High Risk</option>
                     </select>
 
@@ -605,38 +651,30 @@ const paginatedJobs = filteredJobs.slice(
                     >
                       <option value="all">All Jobs in Section</option>
                       <option value="fresh">Fresh — Last 24h</option>
-                      <option value="archive">Archive Jobs</option>
+                      <option value="archive">All Jobs</option>
                     </select>
-                <button
-  onClick={() => {
-    setTitle("");
-    setLocation("");
-    setExperience("");
-    setCategory("");
-    setRisk("");
-    setView("all");
-  }}
-  className="rounded-xl border border-blue-500/20 bg-blue-500/10 px-4 py-3 text-sm text-blue-300 hover:bg-blue-500/20"
->
-  Reset Filters
-</button>
-                
+
+                    <button
+                      onClick={resetOnlyFilters}
+                      className="flex items-center justify-center gap-2 rounded-xl border border-blue-500/20 bg-blue-500/10 px-4 py-3 text-sm text-blue-300 hover:bg-blue-500/20"
+                    >
+                      <RotateCcw className="h-4 w-4" />
+                      Reset
+                    </button>
                   </div>
                 </div>
 
-               <div className="mb-5 flex items-center justify-between">
-  <p className="text-sm text-gray-400">
-    Showing{" "}
-    <span className="font-semibold text-white">
-      {filteredJobs.length}
-    </span>{" "}
-    matching jobs
-  </p>
+                <div className="mb-5 flex items-center justify-between">
+                  <p className="text-sm text-gray-400">
+                    Showing{" "}
+                    <span className="font-semibold text-white">
+                      {filteredJobs.length}
+                    </span>{" "}
+                    matching jobs
+                  </p>
 
-  <p className="text-xs text-gray-500">
-    20 jobs per page
-  </p>
-</div>
+                  <p className="text-xs text-gray-500">20 jobs per page</p>
+                </div>
 
                 <div className="grid gap-4">
                   {paginatedJobs.map((job, index) => {
@@ -657,7 +695,7 @@ const paginatedJobs = filteredJobs.slice(
                               </span>
 
                               <span className="rounded-full bg-blue-500/15 px-3 py-1 text-xs font-medium text-blue-300">
-                                Company Career Link
+                                Official Career Link
                               </span>
 
                               {isSaved && (
@@ -677,7 +715,7 @@ const paginatedJobs = filteredJobs.slice(
                                   job.opt_risk_level
                                 )}`}
                               >
-                                {job.opt_risk_level || "OPT Risk Unknown"}
+                                {riskLabel(job.opt_risk_level)}
                               </span>
 
                               <span className="rounded-full bg-white/10 px-3 py-1 text-xs font-medium text-gray-300">
@@ -685,13 +723,21 @@ const paginatedJobs = filteredJobs.slice(
                               </span>
                             </div>
 
-                            <h2 className="text-xl font-semibold">
-                              {job.title || "Untitled Job"}
-                            </h2>
+                            <div className="mb-3 flex items-center gap-3">
+                              <div className="flex h-11 w-11 items-center justify-center rounded-xl border border-white/10 bg-white/5">
+                                <FileText className="h-5 w-5 text-blue-300" />
+                              </div>
 
-                            <p className="mt-2 text-gray-300">
-                              {job.company || "Unknown Company"}
-                            </p>
+                              <div>
+                                <h2 className="text-xl font-semibold">
+                                  {job.title || "Untitled Job"}
+                                </h2>
+
+                                <p className="mt-1 text-gray-300">
+                                  {job.company || "Unknown Company"}
+                                </p>
+                              </div>
+                            </div>
 
                             <div className="mt-3 flex flex-wrap gap-3 text-sm text-gray-500">
                               <span>{job.location || "Location not listed"}</span>
@@ -701,6 +747,10 @@ const paginatedJobs = filteredJobs.slice(
                               <span>{job.role_category || "Other"}</span>
                               <span>•</span>
                               <span>{job.ats_platform || "Career Site"}</span>
+                              <span>•</span>
+                              <span className="text-green-300">
+                                Verified source
+                              </span>
                             </div>
 
                             <div className="mt-4 flex flex-wrap gap-2">
@@ -721,7 +771,7 @@ const paginatedJobs = filteredJobs.slice(
                             </div>
                           </div>
 
-                          <div className="w-full shrink-0 md:w-48">
+                          <div className="w-full shrink-0 md:w-56">
                             <div
                               className={`mb-3 rounded-2xl border p-4 text-center ${confidenceColor(
                                 confidence
@@ -731,6 +781,9 @@ const paginatedJobs = filteredJobs.slice(
                               <p className="mt-1 text-3xl font-bold">
                                 {confidence}%
                               </p>
+                              <p className="text-xs">
+                                {confidenceLabel(confidence)}
+                              </p>
                             </div>
 
                             <button
@@ -738,10 +791,11 @@ const paginatedJobs = filteredJobs.slice(
                               disabled={isSaved}
                               className={
                                 isSaved
-                                  ? "mb-3 block w-full rounded-xl border border-purple-500/20 bg-purple-500/10 px-5 py-3 text-center font-semibold text-purple-300"
-                                  : "mb-3 block w-full rounded-xl border border-white/10 px-5 py-3 text-center font-semibold hover:bg-white/5"
+                                  ? "mb-3 flex w-full items-center justify-center gap-2 rounded-xl border border-purple-500/20 bg-purple-500/10 px-5 py-3 text-center font-semibold text-purple-300"
+                                  : "mb-3 flex w-full items-center justify-center gap-2 rounded-xl border border-white/10 px-5 py-3 text-center font-semibold hover:bg-white/5"
                               }
                             >
+                              <Bookmark className="h-4 w-4" />
                               {isSaved ? "Saved ✓" : "Save Job"}
                             </button>
 
@@ -759,67 +813,51 @@ const paginatedJobs = filteredJobs.slice(
                               }}
                               className={
                                 isApplied
-                                  ? "block w-full rounded-xl bg-emerald-500/20 px-5 py-3 text-center font-semibold text-emerald-300"
-                                  : "block w-full rounded-xl bg-white px-5 py-3 text-center font-semibold text-black hover:bg-gray-200"
+                                  ? "flex w-full items-center justify-center gap-2 rounded-xl bg-emerald-500/20 px-5 py-3 text-center font-semibold text-emerald-300"
+                                  : "flex w-full items-center justify-center gap-2 rounded-xl bg-white px-5 py-3 text-center font-semibold text-black hover:bg-gray-200"
                               }
                             >
-                              {isApplied ? "Applied ✓" : "Apply Direct"}
+                              <Send className="h-4 w-4" />
+                              {isApplied ? "Applied ✓" : "Apply on Company Site"}
                             </button>
                           </div>
                         </div>
                       </article>
                     );
                   })}
+
                   {filteredJobs.length > jobsPerPage && (
-  <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
-    <button
-      onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
-      disabled={currentPage === 1}
-      className="rounded-xl border border-white/10 px-5 py-3 disabled:opacity-40"
-    >
-      Previous
-    </button>
+                    <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
+                      <button
+                        onClick={() =>
+                          setCurrentPage((p) => Math.max(1, p - 1))
+                        }
+                        disabled={currentPage === 1}
+                        className="rounded-xl border border-white/10 px-5 py-3 disabled:opacity-40"
+                      >
+                        Prev
+                      </button>
 
-    <span className="text-sm text-gray-400">
-      Page {currentPage} of {totalPages}
-    </span>
+                      <span className="rounded-xl bg-white px-4 py-3 text-sm font-bold text-black">
+                        {currentPage}
+                      </span>
 
-    <button
-      onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
-      disabled={currentPage === totalPages}
-      className="rounded-xl border border-white/10 px-5 py-3 disabled:opacity-40"
-    >
-      Next
-    </button>
-  </div>
-)}
-{filteredJobs.length > jobsPerPage && (
-  <div className="mt-8 flex items-center justify-center gap-3">
-    <button
-      onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
-      disabled={currentPage === 1}
-      className="rounded-xl border border-white/10 px-5 py-3 disabled:opacity-40"
-    >
-      Prev
-    </button>
+                      <span className="text-sm text-gray-500">
+                        of {totalPages}
+                      </span>
 
-    <span className="rounded-xl bg-white px-4 py-3 text-sm font-bold text-black">
-      {currentPage}
-    </span>
+                      <button
+                        onClick={() =>
+                          setCurrentPage((p) => Math.min(totalPages, p + 1))
+                        }
+                        disabled={currentPage === totalPages}
+                        className="rounded-xl border border-white/10 px-5 py-3 disabled:opacity-40"
+                      >
+                        Next
+                      </button>
+                    </div>
+                  )}
 
-    <span className="text-sm text-gray-500">
-      of {totalPages}
-    </span>
-
-    <button
-      onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
-      disabled={currentPage === totalPages}
-      className="rounded-xl border border-white/10 px-5 py-3 disabled:opacity-40"
-    >
-      Next
-    </button>
-  </div>
-)}
                   {filteredJobs.length === 0 && (
                     <div className="rounded-2xl border border-white/10 bg-white/5 p-10 text-center">
                       <p className="text-xl font-semibold">No jobs found</p>
