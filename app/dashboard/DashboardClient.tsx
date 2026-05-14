@@ -450,9 +450,7 @@ export default function DashboardClient({
     <LogOut className="h-4 w-4" />
     Logout
   </button>
-</div>
-
-             <div className="mt-8 grid gap-4 sm:grid-cols-2 xl:grid-cols-6">
+<div className="mt-8 grid gap-4 sm:grid-cols-2 xl:grid-cols-6">
   {[
     ["Fresh Jobs", stats.fresh, Clock3],
     ["All Jobs", stats.archive, FolderOpen],
@@ -475,6 +473,7 @@ export default function DashboardClient({
 
   <div className="rounded-3xl border border-green-500/20 bg-green-500/10 p-5 shadow-xl">
     <p className="text-sm text-green-300">Subscription</p>
+
     <p className="mt-2 text-2xl font-bold text-green-300">
       ACTIVE
     </p>
