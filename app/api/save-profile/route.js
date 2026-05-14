@@ -13,7 +13,10 @@ export async function POST(req) {
 
     if (!id || !email) {
       return Response.json(
-        { success: false, error: "User ID and email are required" },
+        {
+          success: false,
+          error: "User ID and email are required",
+        },
         { status: 400 }
       );
     }
@@ -29,15 +32,23 @@ export async function POST(req) {
 
     if (error) {
       return Response.json(
-        { success: false, error: error.message },
+        {
+          success: false,
+          error: error.message,
+        },
         { status: 500 }
       );
     }
 
-    return Response.json({ success: true });
+    return Response.json({
+      success: true,
+    });
   } catch (err) {
     return Response.json(
-      { success: false, error: err.message },
+      {
+        success: false,
+        error: err.message,
+      },
       { status: 500 }
     );
   }
