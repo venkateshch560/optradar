@@ -435,7 +435,7 @@ export default function DashboardClient({
                   </div>
                 </div>
 
-              <div className="flex flex-wrap gap-3">
+        <div className="flex flex-wrap gap-3">
   <button
     onClick={resetFilters}
     className="rounded-xl border border-white/10 px-4 py-3 text-sm hover:bg-white/5"
@@ -450,6 +450,10 @@ export default function DashboardClient({
     <LogOut className="h-4 w-4" />
     Logout
   </button>
+</div>
+
+</div>
+
 <div className="mt-8 grid gap-4 sm:grid-cols-2 xl:grid-cols-6">
   {[
     ["Fresh Jobs", stats.fresh, Clock3],
