@@ -10,6 +10,7 @@ const supabase = createClient(
 
 export default function LoginPage() {
   const [isSignup, setIsSignup] = useState(false);
+  const [message, setMessage] = useState("");
 
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
