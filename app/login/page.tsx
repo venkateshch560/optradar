@@ -60,6 +60,7 @@ setMessage(error.message);
     "Content-Type": "application/json",
   },
   body: JSON.stringify({
+    id: data.user?.id,
     email,
     first_name: firstName,
     last_name: lastName,
