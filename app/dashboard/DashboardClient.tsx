@@ -36,7 +36,8 @@ export default function DashboardClient({
       minute: "2-digit",
     })
   );
-
+const [currentPage, setCurrentPage] = useState(1);
+const jobsPerPage = 20;
   const safeJobs = jobs || [];
   const now = Date.now();
 
@@ -228,7 +229,15 @@ export default function DashboardClient({
 
     return true;
   });
+const totalPages = Math.ceil(filteredJobs.length / jobsPerPage);
 
+const paginatedJobs = filteredJobs.slice(
+  (currentPage - 1) * jobsPerPage,
+  currentPage * jobsPerPage
+);
+  useEffect(() => {
+  setCurrentPage(1);
+}, [quickFilter, title, location, experience, category, risk, view]);
   function resetFilters() {
     setTitle("");
     setLocation("");
@@ -523,6 +532,30 @@ export default function DashboardClient({
               </div>
             ) : (
               <>
+                <div className="mb-6 grid gap-3 md:grid-cols-4">
+  {[
+    "Data / Analytics",
+    "Software / Engineering",
+    "Cloud / DevOps",
+    "Business / Product",
+    "IT Support",
+    "Project / Operations",
+    "Cybersecurity",
+    "Other",
+  ].map((cat) => (
+    <button
+      key={cat}
+      onClick={() => setCategory(cat)}
+      className={
+        category === cat
+          ? "rounded-2xl bg-white px-4 py-3 font-semibold text-black"
+          : "rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-gray-300 hover:bg-white/10"
+      }
+    >
+      {cat}
+    </button>
+  ))}
+</div>
                 <div className="mb-6 rounded-2xl border border-white/10 bg-[#0B1020] p-5 shadow-xl">
                   <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-6">
                     <input
@@ -607,7 +640,7 @@ export default function DashboardClient({
                 </p>
 
                 <div className="grid gap-4">
-                  {filteredJobs.map((job, index) => {
+                  {paginatedJobs.map((job, index) => {
                     const confidence = job.apply_confidence ?? 50;
                     const isSaved = savedIds.includes(job.id);
                     const isApplied = appliedIds.includes(job.id);
@@ -738,6 +771,29 @@ export default function DashboardClient({
                       </article>
                     );
                   })}
+                  {filteredJobs.length > jobsPerPage && (
+  <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
+    <button
+      onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
+      disabled={currentPage === 1}
+      className="rounded-xl border border-white/10 px-5 py-3 disabled:opacity-40"
+    >
+      Previous
+    </button>
+
+    <span className="text-sm text-gray-400">
+      Page {currentPage} of {totalPages}
+    </span>
+
+    <button
+      onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
+      disabled={currentPage === totalPages}
+      className="rounded-xl border border-white/10 px-5 py-3 disabled:opacity-40"
+    >
+      Next
+    </button>
+  </div>
+)}
 
                   {filteredJobs.length === 0 && (
                     <div className="rounded-2xl border border-white/10 bg-white/5 p-10 text-center">
