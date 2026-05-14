@@ -50,7 +50,7 @@ export default function LoginPage() {
     });
 
     if (error) {
-      alert(error.message);
+setMessage(error.message);
       return;
     }
 
@@ -83,7 +83,7 @@ export default function LoginPage() {
     });
 
     if (error) {
-      alert(error.message);
+setMessage(error.message);
       return;
     }
 
