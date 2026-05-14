@@ -54,20 +54,27 @@ setMessage(error.message);
       return;
     }
 
-    const { error: profileError } = await supabase.from("profiles").upsert({
-      email: cleanEmail,
-      first_name: cleanFirstName,
-      last_name: cleanLastName,
-      full_name: `${cleanFirstName} ${cleanLastName}`.trim(),
-      phone: phone.trim(),
-    });
+    const profileRes = await fetch("/api/save-profile", {
+  method: "POST",
+  headers: {
+    "Content-Type": "application/json",
+  },
+  body: JSON.stringify({
+    email,
+    first_name: firstName,
+    last_name: lastName,
+    phone,
+  }),
+});
 
-    if (profileError) {
-      alert("Profile save failed: " + profileError.message);
-      return;
-    }
+const profileData = await profileRes.json();
 
-    alert(
+if (!profileData.success) {
+  setMessage("Profile save failed: " + profileData.error);
+  return;
+}
+
+    setMessage(
       "Account created successfully. Please complete payment to access dashboard."
     );
 
@@ -145,7 +152,11 @@ setMessage(error.message);
           value={password}
           onChange={(e) => setPassword(e.target.value)}
         />
-
+        {message && (
+  <div className="mb-4 rounded-xl border border-red-500/20 bg-red-500/10 p-3 text-sm text-red-300">
+    {message}
+  </div>
+)}
         <button
           onClick={isSignup ? handleSignup : handleLogin}
           className="mt-6 w-full rounded-xl bg-white text-black font-bold p-3 hover:bg-gray-200"
