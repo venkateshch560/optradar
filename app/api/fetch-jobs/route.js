@@ -1,6 +1,8 @@
 import { fetchJobs } from "@/lib/fetchJobs";
 import { fetchGreenhouseJobs } from "@/lib/fetchGreenhouseJobs";
 import { fetchLeverJobs } from "@/lib/fetchLeverJobs";
+import { fetchAshbyJobs } from "@/lib/fetchAshbyJobs";
+import { fetchSmartRecruitersJobs } from "@/lib/fetchSmartRecruitersJobs";
 
 export async function GET(request) {
   const { searchParams } = new URL(request.url);
@@ -13,6 +15,8 @@ export async function GET(request) {
   try {
     const greenhouse = await fetchGreenhouseJobs();
     const lever = await fetchLeverJobs();
+    const ashby = await fetchAshbyJobs();
+    const smartrecruiters = await fetchSmartRecruitersJobs();
 
     let jsearch = 0;
 
@@ -24,10 +28,12 @@ export async function GET(request) {
 
     return Response.json({
       success: true,
-      saved_jobs: greenhouse + lever + jsearch,
+      saved_jobs: greenhouse + lever + ashby + smartrecruiters + jsearch,
       sources: {
         greenhouse,
         lever,
+        ashby,
+        smartrecruiters,
         jsearch,
       },
     });
