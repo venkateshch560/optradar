@@ -435,51 +435,51 @@ export default function DashboardClient({
                   </div>
                 </div>
 
-                <div className="flex flex-wrap gap-3">
-                  <button
-                    onClick={resetFilters}
-                    className="rounded-xl border border-white/10 px-4 py-3 text-sm hover:bg-white/5"
-                  >
-                    Dashboard Home
-                  </button>
+              <div className="flex flex-wrap gap-3">
+  <button
+    onClick={resetFilters}
+    className="rounded-xl border border-white/10 px-4 py-3 text-sm hover:bg-white/5"
+  >
+    Dashboard Home
+  </button>
 
-                  <button
-                    onClick={logout}
-                    className="rounded-xl border border-red-500/20 bg-red-500/10 px-4 py-3 text-sm text-red-300 hover:bg-red-500/20"
-                  >
-                    Logout
-                  </button>
-                </div>
-              </div>
+  <button
+    onClick={logout}
+    className="flex items-center justify-center gap-2 rounded-xl border border-red-500/20 bg-red-500/10 px-4 py-3 text-sm text-red-300 hover:bg-red-500/20"
+  >
+    <LogOut className="h-4 w-4" />
+    Logout
+  </button>
+</div>
 
-              <div className="mt-8 grid gap-4 sm:grid-cols-2 xl:grid-cols-6">
-                {[
-                  ["Fresh Jobs", stats.fresh, Clock3],
-                  ["All Jobs", stats.archive, FolderOpen],
-                  ["Saved Jobs", stats.saved, Bookmark],
-                  ["Applied Jobs", stats.applied, Send],
-                  ["Low OPT Risk", stats.lowRisk, ShieldCheck],
-                ].map(([label, value, Icon]: any) => (
-                  <div
-                    key={label}
-                    className="rounded-3xl border border-white/10 bg-gradient-to-br from-white/[0.07] to-white/[0.02] p-5 shadow-xl"
-                  >
-                    <div className="mb-3 flex items-center gap-3">
-                      <Icon className="h-5 w-5 text-blue-300" />
-                      <p className="text-sm text-gray-400">{label}</p>
-                    </div>
+             <div className="mt-8 grid gap-4 sm:grid-cols-2 xl:grid-cols-6">
+  {[
+    ["Fresh Jobs", stats.fresh, Clock3],
+    ["All Jobs", stats.archive, FolderOpen],
+    ["Saved Jobs", stats.saved, Bookmark],
+    ["Applied Jobs", stats.applied, Send],
+    ["Low OPT Risk", stats.lowRisk, ShieldCheck],
+  ].map(([label, value, Icon]: any) => (
+    <div
+      key={label}
+      className="rounded-3xl border border-white/10 bg-gradient-to-br from-white/[0.07] to-white/[0.02] p-5 shadow-xl"
+    >
+      <div className="mb-3 flex items-center gap-3">
+        <Icon className="h-5 w-5 text-blue-300" />
+        <p className="text-sm text-gray-400">{label}</p>
+      </div>
 
-                    <p className="text-3xl font-bold">{value}</p>
-                  </div>
-                ))}
+      <p className="text-3xl font-bold">{value}</p>
+    </div>
+  ))}
 
-                <div className="rounded-3xl border border-green-500/20 bg-green-500/10 p-5 shadow-xl">
-                  <p className="text-sm text-green-300">Subscription</p>
-                  <p className="mt-2 text-2xl font-bold text-green-300">
-                    ACTIVE
-                  </p>
-                </div>
-              </div>
+  <div className="rounded-3xl border border-green-500/20 bg-green-500/10 p-5 shadow-xl">
+    <p className="text-sm text-green-300">Subscription</p>
+    <p className="mt-2 text-2xl font-bold text-green-300">
+      ACTIVE
+    </p>
+  </div>
+</div>
 
               <div className="mt-6 rounded-3xl border border-white/10 bg-[#0B1020]/80 p-5 shadow-xl">
                 <h3 className="text-lg font-bold">Apply Confidence Guide</h3>
