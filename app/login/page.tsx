@@ -44,10 +44,10 @@ export default function LoginPage() {
     const cleanFirstName = firstName.trim();
     const cleanLastName = lastName.trim();
 
-    const { error } = await supabase.auth.signUp({
-      email: cleanEmail,
-      password,
-    });
+    const { data, error } = await supabase.auth.signUp({
+  email,
+  password,
+});
 
     if (error) {
 setMessage(error.message);
