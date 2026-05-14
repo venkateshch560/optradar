@@ -826,37 +826,34 @@ export default function DashboardClient({
                     );
                   })}
 
-                  {filteredJobs.length > jobsPerPage && (
-                    <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
-                      <button
-                        onClick={() =>
-                          setCurrentPage((p) => Math.max(1, p - 1))
-                        }
-                        disabled={currentPage === 1}
-                        className="rounded-xl border border-white/10 px-5 py-3 disabled:opacity-40"
-                      >
-                        Prev
-                      </button>
+                 {filteredJobs.length > jobsPerPage && (
+  <div className="mt-8 flex items-center justify-center gap-3">
+    <button
+      onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
+      disabled={currentPage === 1}
+      className="rounded-xl border border-white/10 px-5 py-3 disabled:opacity-40"
+    >
+      Prev
+    </button>
 
-                      <span className="rounded-xl bg-white px-4 py-3 text-sm font-bold text-black">
-                        {currentPage}
-                      </span>
+    <span className="rounded-xl bg-white px-4 py-3 text-sm font-bold text-black">
+      {currentPage}
+    </span>
 
-                      <span className="text-sm text-gray-500">
-                        of {totalPages}
-                      </span>
+    <span className="text-sm text-gray-500">
+      of {totalPages}
+    </span>
 
-                      <button
-                        onClick={() =>
-                          setCurrentPage((p) => Math.min(totalPages, p + 1))
-                        }
-                        disabled={currentPage === totalPages}
-                        className="rounded-xl border border-white/10 px-5 py-3 disabled:opacity-40"
-                      >
-                        Next
-                      </button>
-                    </div>
-                  )}
+    <button
+      onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
+      disabled={currentPage === totalPages}
+      className="rounded-xl border border-white/10 px-5 py-3 disabled:opacity-40"
+    >
+      Next
+    </button>
+  </div>
+)}
+                      
 
                   {filteredJobs.length === 0 && (
                     <div className="rounded-2xl border border-white/10 bg-white/5 p-10 text-center">
