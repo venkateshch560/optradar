@@ -532,30 +532,6 @@ const paginatedJobs = filteredJobs.slice(
               </div>
             ) : (
               <>
-                <div className="mb-6 grid gap-3 md:grid-cols-4">
-  {[
-    "Data / Analytics",
-    "Software / Engineering",
-    "Cloud / DevOps",
-    "Business / Product",
-    "IT Support",
-    "Project / Operations",
-    "Cybersecurity",
-    "Other",
-  ].map((cat) => (
-    <button
-      key={cat}
-      onClick={() => setCategory(cat)}
-      className={
-        category === cat
-          ? "rounded-2xl bg-white px-4 py-3 font-semibold text-black"
-          : "rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-gray-300 hover:bg-white/10"
-      }
-    >
-      {cat}
-    </button>
-  ))}
-</div>
                 <div className="mb-6 rounded-2xl border border-white/10 bg-[#0B1020] p-5 shadow-xl">
                   <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-6">
                     <input
