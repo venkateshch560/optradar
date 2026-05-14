@@ -9,16 +9,17 @@ export async function POST(req) {
   try {
     const body = await req.json();
 
-    const { email, first_name, last_name, phone } = body;
+    const { id, email, first_name, last_name, phone } = body;
 
-    if (!email) {
+    if (!id || !email) {
       return Response.json(
-        { success: false, error: "Email is required" },
+        { success: false, error: "User ID and email are required" },
         { status: 400 }
       );
     }
 
     const { error } = await supabase.from("profiles").upsert({
+      id,
       email,
       first_name,
       last_name,
