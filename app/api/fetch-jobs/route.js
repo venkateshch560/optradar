@@ -1,4 +1,6 @@
 import { fetchJobs } from "@/lib/fetchJobs";
+import { fetchGreenhouseJobs } from "@/lib/fetchGreenhouseJobs";
+import { fetchLeverJobs } from "@/lib/fetchLeverJobs";
 
 export async function GET(request) {
   const { searchParams } = new URL(request.url);
@@ -9,11 +11,25 @@ export async function GET(request) {
   }
 
   try {
-    const total = await fetchJobs();
+    const greenhouse = await fetchGreenhouseJobs();
+    const lever = await fetchLeverJobs();
+
+    let jsearch = 0;
+
+    try {
+      jsearch = await fetchJobs();
+    } catch (err) {
+      console.log("JSEARCH SKIPPED:", err.message);
+    }
 
     return Response.json({
       success: true,
-      saved_jobs: total,
+      saved_jobs: greenhouse + lever + jsearch,
+      sources: {
+        greenhouse,
+        lever,
+        jsearch,
+      },
     });
   } catch (error) {
     return Response.json(
