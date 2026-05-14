@@ -238,6 +238,9 @@ const paginatedJobs = filteredJobs.slice(
   useEffect(() => {
   setCurrentPage(1);
 }, [quickFilter, title, location, experience, category, risk, view]);
+  useEffect(() => {
+  setCurrentPage(1);
+}, [quickFilter, title, location, experience, category, risk, view]);
   function resetFilters() {
     setTitle("");
     setLocation("");
@@ -295,7 +298,7 @@ const paginatedJobs = filteredJobs.slice(
   const navItems = [
     { id: "dashboard", label: "Dashboard" },
     { id: "fresh", label: "Fresh Jobs" },
-    { id: "archive", label: "Archive Jobs" },
+    { id: "archive", label: "All Jobs" },
     { id: "entry", label: "Entry Level" },
     { id: "remote", label: "Remote Jobs" },
     { id: "lowrisk", label: "Low-Risk Jobs" },
@@ -408,17 +411,17 @@ const paginatedJobs = filteredJobs.slice(
                 </div>
               </div>
 
-              <div className="mt-8 grid gap-4 sm:grid-cols-2 xl:grid-cols-6">
+              <div className="mt-8 grid gap-4 sm:grid-cols-2 xl:grid-cols-7">
                 {[
                   ["Fresh Jobs", stats.fresh],
-                  ["Archive Jobs", stats.archive],
+                  ["All Jobs", stats.archive],
                   ["Saved Jobs", stats.saved],
                   ["Applied Jobs", stats.applied],
                   ["Low OPT Risk", stats.lowRisk],
                 ].map(([label, value]) => (
                   <div
                     key={label}
-                    className="rounded-2xl border border-white/10 bg-white/5 p-5"
+                    className="rounded-3xl border border-white/10 bg-gradient-to-br from-white/[0.07] to-white/[0.02] p-5 shadow-xl"
                   >
                     <p className="text-sm text-gray-400">{label}</p>
                     <p className="mt-2 text-3xl font-bold">{value}</p>
@@ -533,7 +536,7 @@ const paginatedJobs = filteredJobs.slice(
             ) : (
               <>
                 <div className="mb-6 rounded-2xl border border-white/10 bg-[#0B1020] p-5 shadow-xl">
-                  <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-6">
+                  <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-7">
                     <input
                       className="rounded-xl border border-white/10 bg-white/5 p-3 outline-none placeholder:text-gray-500"
                       placeholder="Job title"
@@ -604,16 +607,36 @@ const paginatedJobs = filteredJobs.slice(
                       <option value="fresh">Fresh — Last 24h</option>
                       <option value="archive">Archive Jobs</option>
                     </select>
+                <button
+  onClick={() => {
+    setTitle("");
+    setLocation("");
+    setExperience("");
+    setCategory("");
+    setRisk("");
+    setView("all");
+  }}
+  className="rounded-xl border border-blue-500/20 bg-blue-500/10 px-4 py-3 text-sm text-blue-300 hover:bg-blue-500/20"
+>
+  Reset Filters
+</button>
+                
                   </div>
                 </div>
 
-                <p className="mb-4 text-gray-400">
-                  Showing{" "}
-                  <span className="font-semibold text-white">
-                    {filteredJobs.length}
-                  </span>{" "}
-                  jobs
-                </p>
+               <div className="mb-5 flex items-center justify-between">
+  <p className="text-sm text-gray-400">
+    Showing{" "}
+    <span className="font-semibold text-white">
+      {filteredJobs.length}
+    </span>{" "}
+    matching jobs
+  </p>
+
+  <p className="text-xs text-gray-500">
+    20 jobs per page
+  </p>
+</div>
 
                 <div className="grid gap-4">
                   {paginatedJobs.map((job, index) => {
@@ -624,7 +647,7 @@ const paginatedJobs = filteredJobs.slice(
                     return (
                       <article
                         key={job.id || index}
-                        className="rounded-2xl border border-white/10 bg-[#0B1020] p-5 shadow-lg transition hover:border-blue-500/40"
+                        className="rounded-3xl border border-white/10 bg-gradient-to-br from-[#0B1020] to-[#080B16] p-6 shadow-xl transition hover:border-blue-500/40 hover:shadow-blue-500/10"
                       >
                         <div className="flex flex-col gap-5 md:flex-row md:justify-between">
                           <div className="flex-1">
@@ -770,7 +793,33 @@ const paginatedJobs = filteredJobs.slice(
     </button>
   </div>
 )}
+{filteredJobs.length > jobsPerPage && (
+  <div className="mt-8 flex items-center justify-center gap-3">
+    <button
+      onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
+      disabled={currentPage === 1}
+      className="rounded-xl border border-white/10 px-5 py-3 disabled:opacity-40"
+    >
+      Prev
+    </button>
 
+    <span className="rounded-xl bg-white px-4 py-3 text-sm font-bold text-black">
+      {currentPage}
+    </span>
+
+    <span className="text-sm text-gray-500">
+      of {totalPages}
+    </span>
+
+    <button
+      onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
+      disabled={currentPage === totalPages}
+      className="rounded-xl border border-white/10 px-5 py-3 disabled:opacity-40"
+    >
+      Next
+    </button>
+  </div>
+)}
                   {filteredJobs.length === 0 && (
                     <div className="rounded-2xl border border-white/10 bg-white/5 p-10 text-center">
                       <p className="text-xl font-semibold">No jobs found</p>
