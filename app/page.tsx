@@ -430,89 +430,167 @@ export default function HomePage() {
       </section>
 
       {/* FOOTER */}
-      <footer className="px-6 py-14">
-        <div className="mx-auto grid max-w-7xl gap-10 md:grid-cols-4">
-          <div>
-            <div className="flex items-center gap-3">
-              <div className="flex h-10 w-10 items-center justify-center rounded-full border border-blue-500/40 bg-blue-500/10">
-                <Clock3 className="h-5 w-5 text-blue-300" />
-              </div>
-              <div>
-                <h3 className="text-xl font-bold">OPT Radar</h3>
-                <p className="text-xs text-gray-400">by The AI Solutionist</p>
-              </div>
-            </div>
+     <footer className="border-t border-white/10 bg-[#060816] px-6 py-16">
+  <div className="mx-auto grid max-w-7xl gap-12 md:grid-cols-4">
 
-            <p className="mt-5 text-sm leading-6 text-gray-400">
-              Helping OPT students apply smarter, earlier, and with confidence.
-            </p>
-
-            <div className="mt-5 flex gap-3">
-              {[Linkedin, Instagram, Youtube].map((Icon, i) => (
-                <div key={i} className="flex h-10 w-10 items-center justify-center rounded-full bg-white/5">
-                  <Icon className="h-4 w-4 text-gray-300" />
-                </div>
-              ))}
-            </div>
-          </div>
-
-          <div>
-            <h4 className="font-bold">Product</h4>
-            <div className="mt-4 space-y-3 text-sm text-gray-400">
-              <p>Why It Works</p>
-              <p>Features</p>
-              <p>Dashboard Preview</p>
-              <p>Pricing</p>
-            </div>
-          </div>
-
-          <div>
-            <h4 className="font-bold">Company</h4>
-            <div className="mt-4 space-y-3 text-sm text-gray-400">
-              <p>About Us</p>
-              <p>Privacy Policy</p>
-              <p>Terms of Service</p>
-            </div>
-          </div>
-
-          <div className="rounded-3xl border border-white/10 bg-[#0B1020] p-6">
-            <h4 className="font-bold">Need help? We’re here.</h4>
-            <p className="mt-2 text-sm text-gray-400">
-              Our support team typically replies within a few hours.
-            </p>
-
-            <div className="mt-5 space-y-4 text-sm">
-              <div className="flex gap-3">
-                <Mail className="h-5 w-5 text-blue-300" />
-                <div>
-                  <p className="font-semibold">Email</p>
-                  <p className="text-gray-400">support@optradar.ai</p>
-                </div>
-              </div>
-
-              <div className="flex gap-3">
-                <MessageCircle className="h-5 w-5 text-green-300" />
-                <div>
-                  <p className="font-semibold">Live Chat</p>
-                  <p className="text-gray-400">Available inside the app</p>
-                </div>
-              </div>
-
-              <div className="flex gap-3">
-                <Timer className="h-5 w-5 text-purple-300" />
-                <div>
-                  <p className="font-semibold">Response Time</p>
-                  <p className="text-gray-400">Usually within a few hours</p>
-                </div>
-              </div>
-            </div>
-          </div>
+    {/* BRAND */}
+    <div>
+      <div className="flex items-center gap-3">
+        <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-gradient-to-br from-blue-500 to-purple-500 shadow-lg shadow-blue-500/20">
+          <Clock3 className="h-5 w-5 text-white" />
         </div>
 
-        <p className="mt-12 text-center text-sm text-gray-500">
-          © 2025 OPT Radar by The AI Solutionist. All rights reserved.
+        <div>
+          <h3 className="text-2xl font-bold">OPT Radar</h3>
+          <p className="text-sm text-gray-400">
+            by The AI Solutionist
+          </p>
+        </div>
+      </div>
+
+      <p className="mt-5 max-w-sm text-sm leading-7 text-gray-400">
+        OPT Radar helps international students discover fresh,
+        direct-employer opportunities faster with OPT-aware filtering
+        and apply-confidence scoring.
+      </p>
+
+      <div className="mt-6 flex gap-3">
+        <a
+          href="mailto:support@theaisolutionist.com"
+          className="flex h-11 w-11 items-center justify-center rounded-xl border border-white/10 bg-white/[0.04] hover:bg-white/[0.08]"
+        >
+          <Mail className="h-5 w-5 text-blue-300" />
+        </a>
+      </div>
+    </div>
+
+    {/* PRODUCT */}
+    <div>
+      <h4 className="text-lg font-bold">Platform</h4>
+
+      <div className="mt-5 space-y-4 text-sm text-gray-400">
+        <a href="#why" className="block hover:text-white">
+          Why It Works
+        </a>
+
+        <a href="#features" className="block hover:text-white">
+          Features
+        </a>
+
+        <a href="#preview" className="block hover:text-white">
+          Dashboard Preview
+        </a>
+
+        <a href="#pricing" className="block hover:text-white">
+          Pricing
+        </a>
+
+        <a href="/login" className="block hover:text-white">
+          Login
+        </a>
+      </div>
+    </div>
+
+    {/* FEATURES */}
+    <div>
+      <h4 className="text-lg font-bold">Core Features</h4>
+
+      <div className="mt-5 space-y-4 text-sm text-gray-400">
+        <div className="flex items-center gap-2">
+          <CheckCircle className="h-4 w-4 text-green-300" />
+          Hourly Fresh Jobs
+        </div>
+
+        <div className="flex items-center gap-2">
+          <CheckCircle className="h-4 w-4 text-green-300" />
+          Official Career Links
+        </div>
+
+        <div className="flex items-center gap-2">
+          <CheckCircle className="h-4 w-4 text-green-300" />
+          OPT Risk Detection
+        </div>
+
+        <div className="flex items-center gap-2">
+          <CheckCircle className="h-4 w-4 text-green-300" />
+          AI Confidence Scoring
+        </div>
+
+        <div className="flex items-center gap-2">
+          <CheckCircle className="h-4 w-4 text-green-300" />
+          Saved & Applied Tracking
+        </div>
+      </div>
+    </div>
+
+    {/* SUPPORT */}
+    <div className="rounded-3xl border border-blue-500/20 bg-gradient-to-br from-blue-500/10 to-purple-500/10 p-6">
+      <div className="flex items-center gap-3">
+        <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-blue-500/20">
+          <MessageCircle className="h-5 w-5 text-blue-300" />
+        </div>
+
+        <div>
+          <h4 className="text-lg font-bold">
+            Need Help?
+          </h4>
+
+          <p className="text-sm text-gray-400">
+            Contact our support team
+          </p>
+        </div>
+      </div>
+
+      <div className="mt-6 rounded-2xl border border-white/10 bg-black/20 p-4">
+        <p className="text-sm text-gray-400">
+          Support Email
         </p>
-      </footer>
-    </main>
-  );
-}
+
+        <a
+          href="mailto:support@theaisolutionist.com"
+          className="mt-2 block text-lg font-semibold text-blue-300 hover:text-blue-200"
+        >
+          support@theaisolutionist.com
+        </a>
+      </div>
+
+      <div className="mt-5 flex items-start gap-3 rounded-2xl border border-green-500/20 bg-green-500/10 p-4">
+        <ShieldCheck className="mt-1 h-5 w-5 text-green-300" />
+
+        <div>
+          <p className="font-semibold text-green-300">
+            Premium Support
+          </p>
+
+          <p className="mt-1 text-sm leading-6 text-gray-300">
+            Most support requests are answered within a few hours.
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  {/* BOTTOM */}
+  <div className="mx-auto mt-14 flex max-w-7xl flex-col items-center justify-between gap-4 border-t border-white/10 pt-8 text-sm text-gray-500 md:flex-row">
+    <p>
+      © 2026 OPT Radar by The AI Solutionist. All rights reserved.
+    </p>
+
+    <div className="flex items-center gap-6">
+      <a href="/login" className="hover:text-white">
+        Login
+      </a>
+
+      <a href="#pricing" className="hover:text-white">
+        Pricing
+      </a>
+
+      <a
+        href="mailto:support@theaisolutionist.com"
+        className="hover:text-white"
+      >
+        Contact
+      </a>
+    </div>
+  </div>
+</footer>
