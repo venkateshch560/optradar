@@ -520,8 +520,7 @@ export default function HomePage() {
         >
           Contact
         </a>
-      </div>
-    </div>
+     
   </div>
 </footer>
     </main>
