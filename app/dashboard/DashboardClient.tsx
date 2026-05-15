@@ -217,9 +217,17 @@ useEffect(() => {
     alert("Job saved.");
   }
 
-  function isFreshJob(job: any) {
-    return now - new Date(job.created_at).getTime() <= 24 * 60 * 60 * 1000;
-  }
+ function isFreshJob(job: any) {
+  const dateToCheck = job.posted_at || job.created_at;
+
+  if (!dateToCheck) return false;
+
+  const jobTime = new Date(dateToCheck).getTime();
+
+  if (Number.isNaN(jobTime)) return false;
+
+  return now - jobTime <= 24 * 60 * 60 * 1000;
+}
 
  const freshJobs = safeJobs.filter((job) => isFreshJob(job));
 const olderJobs = safeJobs.filter((job) => !isFreshJob(job));
