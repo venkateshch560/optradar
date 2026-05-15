@@ -49,12 +49,29 @@ export default function DashboardClient({
 
   const jobsPerPage = 20;
 
-  const [lastRefreshed] = useState(
+ const [lastRefreshed, setLastRefreshed] = useState(
+  new Date().toLocaleTimeString([], {
+    hour: "2-digit",
+    minute: "2-digit",
+  })
+);
+
+useEffect(() => {
+  const interval = setInterval(() => {
+    window.location.reload();
+  }, 60 * 60 * 1000);
+
+  return () => clearInterval(interval);
+}, []);
+
+useEffect(() => {
+  setLastRefreshed(
     new Date().toLocaleTimeString([], {
       hour: "2-digit",
       minute: "2-digit",
     })
   );
+}, []);
 
   const safeJobs = jobs || [];
   const now = Date.now();
@@ -204,18 +221,22 @@ export default function DashboardClient({
     return now - new Date(job.created_at).getTime() <= 24 * 60 * 60 * 1000;
   }
 
-  const stats = useMemo(() => {
-    return {
-      fresh: safeJobs.filter((job) => isFreshJob(job)).length,
-      archive: safeJobs.filter((job) => !isFreshJob(job)).length,
-      saved: savedIds.length,
-      applied: appliedIds.length,
-      lowRisk: safeJobs.filter((job) => job.opt_risk_level === "Low Risk")
-        .length,
-    };
-  }, [safeJobs, savedIds, appliedIds]);
+ const freshJobs = safeJobs.filter((job) => isFreshJob(job));
+const olderJobs = safeJobs.filter((job) => !isFreshJob(job));
 
-  const filteredJobs = safeJobs.filter((job) => {
+const stats = useMemo(() => {
+  return {
+    fresh: freshJobs.length,
+    archive: olderJobs.length,
+    saved: savedIds.length,
+    applied: appliedIds.length,
+    lowRisk: freshJobs.filter((job) => job.opt_risk_level === "Low Risk")
+      .length,
+  };
+}, [safeJobs, savedIds, appliedIds]);
+
+const filteredJobs = safeJobs
+  .filter((job) => {
     const fresh = isFreshJob(job);
 
     if (quickFilter === "dashboard") return false;
@@ -232,22 +253,25 @@ export default function DashboardClient({
     if (quickFilter === "applied" && !appliedIds.includes(job.id))
       return false;
 
-    if (view === "fresh" && !fresh) return false;
-    if (view === "archive" && fresh) return false;
-
     if (title && !job.title?.toLowerCase().includes(title.toLowerCase()))
       return false;
+
     if (
       location &&
       !job.location?.toLowerCase().includes(location.toLowerCase())
     )
       return false;
+
     if (experience && job.experience_level !== experience) return false;
     if (category && job.role_category !== category) return false;
     if (risk && job.opt_risk_level !== risk) return false;
 
     return true;
-  });
+  })
+  .sort(
+    (a, b) =>
+      new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
+  );
 
   const totalPages = Math.ceil(filteredJobs.length / jobsPerPage);
 
