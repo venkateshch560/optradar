@@ -406,102 +406,152 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* CTA */}
-      <section className="border-b border-white/10 px-6 py-16 text-center md:px-10">
-        <h2 className="mx-auto max-w-4xl text-4xl font-black leading-tight tracking-[-0.03em] md:text-6xl">
-          Apply smarter. Apply earlier.
-        </h2>
+ {/* FOOTER */}
+<footer className="border-t border-white/10 bg-[#050813] px-6 py-14 md:px-10">
+  <div className="mx-auto max-w-7xl">
+    <div className="grid gap-12 md:grid-cols-[1.2fr_0.7fr_1fr]">
+      
+      {/* LEFT */}
+      <div>
+        <div className="flex items-center gap-4">
+          <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br from-blue-500 to-purple-500 shadow-lg shadow-blue-500/20">
+            <Clock3 className="h-6 w-6 text-white" />
+          </div>
 
-        <p className="mx-auto mt-5 max-w-2xl text-lg text-gray-400">
-          Built for OPT/STEM students who cannot afford to waste time on the
-          wrong jobs.
+          <div>
+            <h3 className="text-3xl font-bold tracking-tight text-white">
+              OPT Radar
+            </h3>
+
+            <p className="text-sm text-gray-400">
+              by The AI Solutionist
+            </p>
+          </div>
+        </div>
+
+        <p className="mt-6 max-w-md text-[15px] leading-8 text-gray-400">
+          Fresh OPT/STEM job intelligence platform built for international
+          students with hourly updates, official apply links, and OPT risk
+          insights.
         </p>
 
         <a
-          href="/login"
-          className="mt-8 inline-block rounded-2xl bg-white px-10 py-4 text-lg font-black text-black transition hover:scale-[1.02]"
+          href={GMAIL_LINK}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="mt-8 inline-flex items-center gap-3 rounded-2xl border border-white/10 bg-white/[0.03] px-5 py-4 text-sm font-medium text-blue-300 transition hover:border-blue-500/40 hover:bg-blue-500/10"
         >
-          Subscribe Now
+          <Mail className="h-5 w-5" />
+          {SUPPORT_EMAIL}
         </a>
-      </section>
+      </div>
 
-      {/* FOOTER */}
-      <footer className="border-t border-white/10 bg-[#050813] px-6 py-12 md:px-10">
-        <div className="mx-auto grid max-w-7xl gap-10 md:grid-cols-3 md:items-start">
-          <div>
-            <div className="flex items-center gap-3">
-              <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-gradient-to-br from-blue-500 to-purple-500">
-                <Clock3 className="h-5 w-5 text-white" />
-              </div>
+      {/* CENTER */}
+      <div>
+        <h4 className="text-lg font-semibold text-white">
+          Navigation
+        </h4>
 
-              <div>
-                <h3 className="text-2xl font-bold tracking-tight">OPT Radar</h3>
-                <p className="text-sm text-gray-400">by The AI Solutionist</p>
-              </div>
-            </div>
+        <div className="mt-6 space-y-4 text-[15px] text-gray-400">
+          <a
+            href="#why"
+            className="block transition hover:text-white"
+          >
+            Why It Works
+          </a>
 
-            <p className="mt-5 max-w-sm text-sm leading-7 text-gray-400">
-              Fresh OPT/STEM job intelligence platform with official career
-              links, hourly updates, OPT risk signals, and apply confidence
-              scoring.
-            </p>
+          <a
+            href="#features"
+            className="block transition hover:text-white"
+          >
+            Features
+          </a>
 
-            <a
-              href={GMAIL_LINK}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="mt-6 inline-flex items-center gap-3 rounded-xl border border-white/10 bg-white/[0.04] px-4 py-3 text-sm font-semibold text-blue-300 hover:bg-white/[0.08]"
-            >
-              <Mail className="h-4 w-4" />
-              {SUPPORT_EMAIL}
-            </a>
+          <a
+            href="#preview"
+            className="block transition hover:text-white"
+          >
+            Dashboard Preview
+          </a>
+
+          <a
+            href="#pricing"
+            className="block transition hover:text-white"
+          >
+            Pricing
+          </a>
+
+          <a
+            href="/login"
+            className="block transition hover:text-white"
+          >
+            Login
+          </a>
+        </div>
+      </div>
+
+      {/* RIGHT */}
+      <div className="rounded-[28px] border border-white/10 bg-gradient-to-br from-[#0B1220] to-[#0A1020] p-8 shadow-2xl shadow-blue-500/5">
+        <div className="flex items-center gap-3">
+          <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-blue-500/10">
+            <Mail className="h-5 w-5 text-blue-300" />
           </div>
 
           <div>
-            <h4 className="text-lg font-bold text-white">Quick Links</h4>
-            <div className="mt-5 space-y-4 text-sm text-gray-400">
-              <a href="#why" className="block hover:text-white">Why It Works</a>
-              <a href="#features" className="block hover:text-white">Features</a>
-              <a href="#preview" className="block hover:text-white">Dashboard Preview</a>
-              <a href="#pricing" className="block hover:text-white">Pricing</a>
-              <a href="/login" className="block hover:text-white">Login</a>
-            </div>
-          </div>
+            <h4 className="text-xl font-semibold text-white">
+              Contact Support
+            </h4>
 
-          <div className="rounded-3xl border border-blue-500/20 bg-blue-500/10 p-6">
-            <h4 className="text-lg font-bold">Need help?</h4>
-            <p className="mt-2 text-sm text-gray-400">
-              Contact support for billing, login, or dashboard access help.
+            <p className="text-sm text-gray-400">
+              We usually respond within a few hours.
             </p>
-
-            <a
-              href={GMAIL_LINK}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="mt-5 block rounded-2xl border border-white/10 bg-black/20 p-4 text-blue-300 hover:bg-blue-500/10"
-            >
-              {SUPPORT_EMAIL}
-            </a>
           </div>
         </div>
 
-        <div className="mx-auto mt-10 flex max-w-7xl flex-col gap-4 border-t border-white/10 pt-6 text-sm text-gray-500 md:flex-row md:items-center md:justify-between">
-          <p>© 2026 OPT Radar by The AI Solutionist. All rights reserved.</p>
+        <a
+          href={GMAIL_LINK}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="mt-8 flex items-center justify-between rounded-2xl border border-white/10 bg-black/20 px-5 py-5 transition hover:border-blue-500/40 hover:bg-blue-500/10"
+        >
+          <span className="text-[15px] font-medium text-blue-300">
+            {SUPPORT_EMAIL}
+          </span>
 
-          <div className="flex items-center gap-6">
-            <a href="/login" className="hover:text-white">Login</a>
-            <a href="#pricing" className="hover:text-white">Pricing</a>
-            <a
-              href={GMAIL_LINK}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="hover:text-white"
-            >
-              Contact
-            </a>
+          <div className="rounded-xl bg-blue-500/10 p-2">
+            <Send className="h-4 w-4 text-blue-300" />
           </div>
-        </div>
-      </footer>
+        </a>
+      </div>
+    </div>
+
+    {/* BOTTOM */}
+    <div className="mt-14 flex flex-col gap-5 border-t border-white/10 pt-7 text-sm text-gray-500 md:flex-row md:items-center md:justify-between">
+      <p>
+        © 2026 OPT Radar. All rights reserved.
+      </p>
+
+      <div className="flex items-center gap-6">
+        <a href="/login" className="hover:text-white">
+          Login
+        </a>
+
+        <a href="#pricing" className="hover:text-white">
+          Pricing
+        </a>
+
+        <a
+          href={GMAIL_LINK}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="hover:text-white"
+        >
+          Contact
+        </a>
+      </div>
+    </div>
+  </div>
+</footer>
     </main>
   );
 }
