@@ -374,100 +374,80 @@ export default function HomePage() {
         </a>
       </section>
 
-    <footer className="border-t border-white/10 bg-[#060816] px-6 py-16">
-  <div className="mx-auto grid max-w-7xl gap-12 md:grid-cols-4">
-    <div>
-      <div className="flex items-center gap-3">
-        <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-gradient-to-br from-blue-500 to-purple-500">
-          <Clock3 className="h-5 w-5 text-white" />
-        </div>
-
+  <footer className="border-t border-white/10 bg-[#050813] px-6 py-14">
+  <div className="mx-auto max-w-7xl">
+    <div className="rounded-3xl border border-white/10 bg-gradient-to-br from-[#0B1020] to-[#070A12] p-8 md:p-10">
+      <div className="grid gap-10 md:grid-cols-3 md:items-start">
         <div>
-          <h3 className="text-2xl font-bold">OPT Radar</h3>
-          <p className="text-sm text-gray-400">by The AI Solutionist</p>
-        </div>
-      </div>
+          <div className="flex items-center gap-3">
+            <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-gradient-to-br from-blue-500 to-purple-500 shadow-lg shadow-blue-500/20">
+              <Clock3 className="h-5 w-5 text-white" />
+            </div>
 
-      <p className="mt-5 max-w-sm text-sm leading-7 text-gray-400">
-        Helping OPT students apply smarter, earlier, and with confidence.
-      </p>
-
-      <a
-        href="mailto:support@theaisolutionist.com"
-        aria-label="Email support"
-        className="mt-6 flex h-11 w-11 items-center justify-center rounded-xl border border-white/10 bg-white/[0.04] hover:bg-white/[0.08]"
-      >
-        <Mail className="h-5 w-5 text-blue-300" />
-      </a>
-    </div>
-
-    <div>
-      <h4 className="text-lg font-bold">Platform</h4>
-      <div className="mt-5 space-y-4 text-sm text-gray-400">
-        <a href="#why" className="block hover:text-white">Why It Works</a>
-        <a href="#features" className="block hover:text-white">Features</a>
-        <a href="#preview" className="block hover:text-white">Dashboard Preview</a>
-        <a href="#pricing" className="block hover:text-white">Pricing</a>
-        <a href="/login" className="block hover:text-white">Login</a>
-      </div>
-    </div>
-
-    <div>
-      <h4 className="text-lg font-bold">Core Features</h4>
-      <div className="mt-5 space-y-4 text-sm text-gray-400">
-        {[
-          "Hourly Fresh Jobs",
-          "Official Career Links",
-          "OPT Risk Detection",
-          "AI Confidence Scoring",
-          "Saved & Applied Tracking",
-        ].map((item) => (
-          <div key={item} className="flex items-center gap-2">
-            <CheckCircle className="h-4 w-4 text-green-300" />
-            {item}
+            <div>
+              <h3 className="text-2xl font-bold">OPT Radar</h3>
+              <p className="text-sm text-gray-400">by The AI Solutionist</p>
+            </div>
           </div>
-        ))}
-      </div>
-    </div>
 
-    <div className="rounded-3xl border border-blue-500/20 bg-gradient-to-br from-blue-500/10 to-purple-500/10 p-6">
-      <div className="flex items-center gap-3">
-        <a
-          href="mailto:support@theaisolutionist.com"
-          aria-label="Contact support"
-          className="flex h-11 w-11 items-center justify-center rounded-2xl bg-blue-500/20 hover:bg-blue-500/30"
-        >
-          <MessageCircle className="h-5 w-5 text-blue-300" />
-        </a>
+          <p className="mt-5 max-w-sm text-sm leading-7 text-gray-400">
+            Helping OPT students find fresher jobs, avoid wasted applications,
+            and apply with better clarity.
+          </p>
+        </div>
 
         <div>
-          <h4 className="text-lg font-bold">Need Help?</h4>
-          <p className="text-sm text-gray-400">Contact support</p>
+          <h4 className="text-lg font-bold">Quick Links</h4>
+
+          <div className="mt-5 grid gap-3 text-sm text-gray-400">
+            <a href="#why" className="hover:text-white">Why It Works</a>
+            <a href="#features" className="hover:text-white">Features</a>
+            <a href="#preview" className="hover:text-white">Dashboard Preview</a>
+            <a href="#pricing" className="hover:text-white">Pricing</a>
+            <a href="/login" className="hover:text-white">Login</a>
+          </div>
+        </div>
+
+        <div className="rounded-3xl border border-blue-500/20 bg-blue-500/10 p-6">
+          <h4 className="text-lg font-bold">Contact Support</h4>
+
+          <p className="mt-2 text-sm leading-6 text-gray-400">
+            Questions about billing, login, or dashboard access? Email us.
+          </p>
+
+          <a
+            href="https://mail.google.com/mail/?view=cm&fs=1&to=support@theaisolutionist.com"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="mt-6 flex items-center gap-3 rounded-2xl border border-white/10 bg-black/20 p-4 hover:bg-white/[0.06]"
+          >
+            <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-blue-500/20">
+              <Mail className="h-5 w-5 text-blue-300" />
+            </div>
+
+            <span className="break-all text-base font-semibold text-blue-300">
+              support@theaisolutionist.com
+            </span>
+          </a>
         </div>
       </div>
 
-      <div className="mt-6 rounded-2xl border border-white/10 bg-black/20 p-4">
-        <p className="text-sm text-gray-400">Support Email</p>
+      <div className="mt-10 flex flex-col gap-4 border-t border-white/10 pt-6 text-sm text-gray-500 md:flex-row md:items-center md:justify-between">
+        <p>© 2026 OPT Radar by The AI Solutionist. All rights reserved.</p>
 
-        <a
-          href="mailto:support@theaisolutionist.com"
-          className="mt-2 block break-all text-lg font-semibold text-blue-300 hover:text-blue-200"
-        >
-          support@theaisolutionist.com
-        </a>
+        <div className="flex gap-6">
+          <a href="/login" className="hover:text-white">Login</a>
+          <a href="#pricing" className="hover:text-white">Pricing</a>
+          <a
+            href="https://mail.google.com/mail/?view=cm&fs=1&to=support@theaisolutionist.com"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="hover:text-white"
+          >
+            Contact
+          </a>
+        </div>
       </div>
-    </div>
-  </div>
-
-  <div className="mx-auto mt-14 flex max-w-7xl flex-col items-center justify-between gap-4 border-t border-white/10 pt-8 text-sm text-gray-500 md:flex-row">
-    <p>© 2026 OPT Radar by The AI Solutionist. All rights reserved.</p>
-
-    <div className="flex items-center gap-6">
-      <a href="/login" className="hover:text-white">Login</a>
-      <a href="#pricing" className="hover:text-white">Pricing</a>
-      <a href="mailto:support@theaisolutionist.com" className="hover:text-white">
-        Contact
-      </a>
     </div>
   </div>
 </footer>
