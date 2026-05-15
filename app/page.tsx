@@ -110,8 +110,7 @@ export default function HomePage() {
               ))}
             </div>
           </div>
-
-          <div className="rounded-3xl border border-white/10 bg-[#0B1020]/85 p-6 shadow-2xl shadow-blue-500/10 backdrop-blur">
+<div className="rounded-[2rem] border border-white/10 bg-gradient-to-br from-[#0B1020] via-[#0A1020] to-[#070A12] p-6 shadow-2xl shadow-blue-500/10 backdrop-blur">
             <div className="mb-5 flex items-center justify-between">
               <div>
                 <p className="text-sm text-blue-300">Fresh OPT Jobs</p>
@@ -131,7 +130,7 @@ export default function HomePage() {
               ].map(([title, meta, score, risk]) => (
                 <div
                   key={title}
-                  className="rounded-2xl border border-white/10 bg-white/[0.04] p-5 transition hover:border-blue-500/30"
+                  className="rounded-3xl border border-white/10 bg-gradient-to-br from-white/[0.07] to-white/[0.025] p-5 shadow-lg transition hover:border-blue-500/30"
                 >
                   <div className="mb-4 flex flex-wrap gap-2">
                     <span className="rounded-full bg-green-500/15 px-3 py-1 text-xs text-green-300">Fresh</span>
@@ -199,7 +198,7 @@ export default function HomePage() {
             </div>
           </div>
 
-          <div className="rounded-3xl border border-white/10 bg-[#0B1020] p-8 shadow-xl">
+          <div className="rounded-[2rem] border border-white/10 bg-gradient-to-br from-[#0B1020] to-[#070A12] p-7 shadow-2xl shadow-blue-500/10">
             <p className="font-bold text-green-300">OPT Radar Flow</p>
 
             <div className="mt-8 space-y-5">
@@ -215,7 +214,7 @@ export default function HomePage() {
                     {i + 1}
                   </div>
 
-                  <div className="flex-1 rounded-2xl border border-white/10 bg-white/[0.04] p-5">
+                  <div className="flex-1 rounded-3xl border border-white/10 bg-white/[0.035] p-5 shadow-lg">
                     <div className="flex items-center gap-3">
                       <Icon className="h-5 w-5 text-blue-300" />
                       <h3 className="font-bold">{title}</h3>
@@ -427,75 +426,95 @@ export default function HomePage() {
 
       {/* FOOTER */}
       <footer className="border-t border-white/10 bg-[#050813] px-6 py-12 md:px-10">
-        <div className="mx-auto grid max-w-7xl gap-10 md:grid-cols-3 md:items-start">
-          <div>
-            <div className="flex items-center gap-3">
-              <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-gradient-to-br from-blue-500 to-purple-500">
-                <Clock3 className="h-5 w-5 text-white" />
+        <div className="mx-auto max-w-7xl rounded-[2rem] border border-white/10 bg-gradient-to-br from-[#0B1020] to-[#070A12] p-8 shadow-2xl shadow-blue-500/5">
+          <div className="grid gap-10 md:grid-cols-[1.2fr_0.8fr_1fr] md:items-start">
+            <div>
+              <div className="flex items-center gap-3">
+                <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-gradient-to-br from-blue-500 to-purple-500 shadow-lg shadow-blue-500/20">
+                  <Clock3 className="h-5 w-5 text-white" />
+                </div>
+
+                <div>
+                  <h3 className="text-2xl font-bold tracking-tight">
+                    OPT Radar
+                  </h3>
+                  <p className="text-sm text-gray-400">
+                    by The AI Solutionist
+                  </p>
+                </div>
               </div>
 
-              <div>
-                <h3 className="text-2xl font-bold tracking-tight">OPT Radar</h3>
-                <p className="text-sm text-gray-400">by The AI Solutionist</p>
+              <p className="mt-5 max-w-md text-sm leading-7 text-gray-400">
+                Fresh OPT/STEM job intelligence with official career links,
+                hourly updates, OPT risk signals, and apply confidence scoring.
+              </p>
+            </div>
+
+            <div>
+              <h4 className="text-lg font-bold text-white">Quick Links</h4>
+
+              <div className="mt-5 grid gap-3 text-sm text-gray-400">
+                <a href="#why" className="transition hover:text-white">
+                  Why It Works
+                </a>
+                <a href="#features" className="transition hover:text-white">
+                  Features
+                </a>
+                <a href="#preview" className="transition hover:text-white">
+                  Dashboard Preview
+                </a>
+                <a href="#pricing" className="transition hover:text-white">
+                  Pricing
+                </a>
+                <a href="/login" className="transition hover:text-white">
+                  Login
+                </a>
               </div>
             </div>
 
-            <p className="mt-5 max-w-sm text-sm leading-7 text-gray-400">
-              Fresh OPT/STEM job intelligence platform with official career
-              links, hourly updates, OPT risk signals, and apply confidence
-              scoring.
-            </p>
-          </div>
+            <div className="rounded-3xl border border-blue-500/20 bg-blue-500/10 p-6">
+              <h4 className="text-xl font-bold">Contact Support</h4>
 
-          <div className="flex flex-col gap-4 text-sm text-gray-400">
-            <h4 className="text-lg font-bold text-white">Quick Links</h4>
-
-            <a href="#why" className="transition hover:text-white">Why It Works</a>
-            <a href="#features" className="transition hover:text-white">Features</a>
-            <a href="#preview" className="transition hover:text-white">Dashboard Preview</a>
-            <a href="#pricing" className="transition hover:text-white">Pricing</a>
-            <a href="/login" className="transition hover:text-white">Login</a>
-          </div>
-
-          <div className="rounded-3xl border border-blue-500/20 bg-gradient-to-br from-blue-500/10 to-purple-500/10 p-6">
-            <h4 className="text-2xl font-bold">Contact Support</h4>
-
-            <p className="mt-3 text-sm leading-7 text-gray-400">
-              Questions about billing, login, or dashboard access? Email us
-              directly.
-            </p>
-
-            <a
-              href={GMAIL_LINK}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="mt-6 flex items-center gap-4 rounded-2xl border border-white/10 bg-black/20 px-5 py-4 transition hover:border-blue-500/40 hover:bg-blue-500/10"
-            >
-              <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-blue-500/20">
-                <Mail className="h-5 w-5 text-blue-300" />
-              </div>
-
-              <p className="break-all text-lg font-semibold text-blue-300">
-                {SUPPORT_EMAIL}
+              <p className="mt-2 text-sm leading-6 text-gray-400">
+                For billing, login, or dashboard access help, email us directly.
               </p>
-            </a>
+
+              <a
+                href={GMAIL_LINK}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="mt-5 flex items-center gap-3 rounded-2xl border border-white/10 bg-black/20 px-4 py-4 transition hover:border-blue-500/40 hover:bg-blue-500/10"
+              >
+                <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-blue-500/20">
+                  <Mail className="h-5 w-5 text-blue-300" />
+                </div>
+
+                <span className="break-all text-sm font-semibold text-blue-300 sm:text-base">
+                  {SUPPORT_EMAIL}
+                </span>
+              </a>
+            </div>
           </div>
-        </div>
 
-        <div className="mx-auto mt-10 flex max-w-7xl flex-col gap-4 border-t border-white/10 pt-6 text-sm text-gray-500 md:flex-row md:items-center md:justify-between">
-          <p>© 2026 OPT Radar by The AI Solutionist. All rights reserved.</p>
+          <div className="mt-8 flex flex-col gap-4 border-t border-white/10 pt-6 text-sm text-gray-500 md:flex-row md:items-center md:justify-between">
+            <p>© 2026 OPT Radar by The AI Solutionist. All rights reserved.</p>
 
-          <div className="flex items-center gap-6">
-            <a href="/login" className="hover:text-white">Login</a>
-            <a href="#pricing" className="hover:text-white">Pricing</a>
-            <a
-              href={GMAIL_LINK}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="hover:text-white"
-            >
-              Contact
-            </a>
+            <div className="flex items-center gap-6">
+              <a href="/login" className="hover:text-white">
+                Login
+              </a>
+              <a href="#pricing" className="hover:text-white">
+                Pricing
+              </a>
+              <a
+                href={GMAIL_LINK}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="hover:text-white"
+              >
+                Contact
+              </a>
+            </div>
           </div>
         </div>
       </footer>
