@@ -409,95 +409,95 @@ export default function HomePage() {
 {/* FOOTER */}
 <footer className="border-t border-white/10 bg-[#050813] px-6 py-14 md:px-10">
   <div className="mx-auto max-w-7xl">
-    <div className="grid gap-12 md:grid-cols-[1.2fr_0.7fr_1fr]">
-      {/* LEFT */}
-      <div>
-        <div className="flex items-center gap-4">
-          <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br from-blue-500 to-purple-500 shadow-lg shadow-blue-500/20">
-            <Clock3 className="h-6 w-6 text-white" />
-          </div>
-
-          <div>
-            <h3 className="text-3xl font-bold tracking-tight text-white">
-              OPT Radar
-            </h3>
-
-            <p className="text-sm text-gray-500">
-              Smart OPT job discovery
-            </p>
-          </div>
-        </div>
-
-        <p className="mt-6 max-w-md text-[15px] leading-8 text-gray-400">
-          Discover fresh OPT/STEM opportunities faster with official apply links,
-          hourly updates, and intelligent job filtering.
-        </p>
-      </div>
-
-      {/* CENTER */}
-      <div>
-        <h4 className="text-lg font-semibold text-white">
-          Navigation
-        </h4>
-
-        <div className="mt-6 space-y-4 text-[15px] text-gray-400">
-          <a href="#why" className="block transition hover:text-white">
-            Why It Works
-          </a>
-
-          <a href="#features" className="block transition hover:text-white">
-            Features
-          </a>
-
-          <a href="#preview" className="block transition hover:text-white">
-            Dashboard Preview
-          </a>
-
-          <a href="#pricing" className="block transition hover:text-white">
-            Pricing
-          </a>
-
-          <a href="/login" className="block transition hover:text-white">
-            Login
-          </a>
-        </div>
-      </div>
-
-      {/* RIGHT */}
-      <div className="rounded-[30px] border border-white/10 bg-gradient-to-br from-[#0B1220] to-[#09111E] p-8 shadow-[0_0_60px_rgba(59,130,246,0.06)]">
-        <div className="flex items-start gap-4">
-          <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-blue-500/10">
-            <Mail className="h-6 w-6 text-blue-300" />
-          </div>
-
-          <div>
-            <h4 className="text-2xl font-semibold text-white">
-              Support
-            </h4>
-
-            <p className="mt-2 max-w-sm text-sm leading-7 text-gray-400">
-              Need help with billing, account access, or dashboard issues?
-              Our team is available by email.
-            </p>
-          </div>
-        </div>
-
-        <a
-          href={GMAIL_LINK}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="mt-8 flex items-center justify-between rounded-2xl border border-white/10 bg-black/20 px-5 py-5 transition duration-300 hover:border-blue-500/40 hover:bg-blue-500/10"
-        >
-          <span className="text-[15px] font-medium text-blue-300">
-            {SUPPORT_EMAIL}
-          </span>
-
-          <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-blue-500/10">
-            <Send className="h-4 w-4 text-blue-300" />
-          </div>
-        </a>
-      </div>
+<div className="grid gap-16 md:grid-cols-[1.1fr_0.55fr_0.9fr] md:items-start">
+    {/* LEFT */}
+     {/* LEFT */}
+<div className="max-w-sm">
+  <div className="flex items-center gap-4">
+    <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br from-blue-500 to-purple-500 shadow-lg shadow-blue-500/20">
+      <Clock3 className="h-6 w-6 text-white" />
     </div>
+
+    <div>
+      <h3 className="text-[2.1rem] font-bold leading-none tracking-tight text-white">
+        OPT Radar
+      </h3>
+
+      <p className="mt-1 text-sm text-gray-500">
+        OPT/STEM job intelligence
+      </p>
+    </div>
+  </div>
+
+  <p className="mt-7 text-[15px] leading-8 text-gray-400">
+    Fresh OPT and STEM job discovery platform with official apply links,
+    hourly updates, and intelligent filtering built for international students.
+  </p>
+</div>
+
+     {/* CENTER */}
+<div className="md:pl-6">
+  <h4 className="text-sm font-semibold uppercase tracking-[0.18em] text-gray-500">
+    Navigation
+  </h4>
+
+  <div className="mt-6 space-y-5 text-[15px] text-gray-400">
+    <a href="#why" className="block transition hover:text-white">
+      Why It Works
+    </a>
+
+    <a href="#features" className="block transition hover:text-white">
+      Features
+    </a>
+
+    <a href="#preview" className="block transition hover:text-white">
+      Dashboard Preview
+    </a>
+
+    <a href="#pricing" className="block transition hover:text-white">
+      Pricing
+    </a>
+
+    <a href="/login" className="block transition hover:text-white">
+      Login
+    </a>
+  </div>
+</div>
+
+    {/* RIGHT */}
+<div className="rounded-[28px] border border-white/10 bg-gradient-to-br from-[#0B1220] to-[#09111E] p-7 shadow-[0_0_50px_rgba(59,130,246,0.05)]">
+  
+  <div className="flex items-start gap-4">
+    <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-blue-500/10">
+      <Mail className="h-5 w-5 text-blue-300" />
+    </div>
+
+    <div>
+      <h4 className="text-xl font-semibold text-white">
+        Contact Support
+      </h4>
+
+      <p className="mt-2 text-sm leading-7 text-gray-400">
+        Assistance for billing, account access, and dashboard support.
+      </p>
+    </div>
+  </div>
+
+  <a
+    href={GMAIL_LINK}
+    target="_blank"
+    rel="noopener noreferrer"
+    className="mt-7 flex items-center justify-between rounded-2xl border border-white/10 bg-black/20 px-5 py-4 transition duration-300 hover:border-blue-500/40 hover:bg-blue-500/10"
+  >
+    <span className="text-sm font-medium text-blue-300">
+      {SUPPORT_EMAIL}
+    </span>
+
+    <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-blue-500/10">
+      <Send className="h-4 w-4 text-blue-300" />
+    </div>
+  </a>
+</div>
 
     {/* BOTTOM */}
     <div className="mt-14 flex flex-col gap-5 border-t border-white/10 pt-7 text-sm text-gray-500 md:flex-row md:items-center md:justify-between">
