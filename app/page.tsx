@@ -413,38 +413,27 @@ export default function HomePage() {
       
       {/* LEFT */}
       <div>
-        <div className="flex items-center gap-4">
-          <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br from-blue-500 to-purple-500 shadow-lg shadow-blue-500/20">
-            <Clock3 className="h-6 w-6 text-white" />
-          </div>
+  <div className="flex items-center gap-4">
+    <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br from-blue-500 to-purple-500 shadow-lg shadow-blue-500/20">
+      <Clock3 className="h-6 w-6 text-white" />
+    </div>
 
-          <div>
-            <h3 className="text-3xl font-bold tracking-tight text-white">
-              OPT Radar
-            </h3>
+    <div>
+      <h3 className="text-3xl font-bold tracking-tight text-white">
+        OPT Radar
+      </h3>
 
-            <p className="text-sm text-gray-400">
-              by The AI Solutionist
-            </p>
-          </div>
-        </div>
+      <p className="text-sm text-gray-500">
+        Smart OPT job discovery
+      </p>
+    </div>
+  </div>
 
-        <p className="mt-6 max-w-md text-[15px] leading-8 text-gray-400">
-          Fresh OPT/STEM job intelligence platform built for international
-          students with hourly updates, official apply links, and OPT risk
-          insights.
-        </p>
-
-        <a
-          href={GMAIL_LINK}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="mt-8 inline-flex items-center gap-3 rounded-2xl border border-white/10 bg-white/[0.03] px-5 py-4 text-sm font-medium text-blue-300 transition hover:border-blue-500/40 hover:bg-blue-500/10"
-        >
-          <Mail className="h-5 w-5" />
-          {SUPPORT_EMAIL}
-        </a>
-      </div>
+  <p className="mt-6 max-w-md text-[15px] leading-8 text-gray-400">
+    Discover fresh OPT/STEM opportunities faster with official apply links,
+    hourly updates, and intelligent job filtering.
+  </p>
+</div>
 
       {/* CENTER */}
       <div>
@@ -491,39 +480,41 @@ export default function HomePage() {
       </div>
 
       {/* RIGHT */}
-      <div className="rounded-[28px] border border-white/10 bg-gradient-to-br from-[#0B1220] to-[#0A1020] p-8 shadow-2xl shadow-blue-500/5">
-        <div className="flex items-center gap-3">
-          <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-blue-500/10">
-            <Mail className="h-5 w-5 text-blue-300" />
-          </div>
-
-          <div>
-            <h4 className="text-xl font-semibold text-white">
-              Contact Support
-            </h4>
-
-            <p className="text-sm text-gray-400">
-              We usually respond within a few hours.
-            </p>
-          </div>
-        </div>
-
-        <a
-          href={GMAIL_LINK}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="mt-8 flex items-center justify-between rounded-2xl border border-white/10 bg-black/20 px-5 py-5 transition hover:border-blue-500/40 hover:bg-blue-500/10"
-        >
-          <span className="text-[15px] font-medium text-blue-300">
-            {SUPPORT_EMAIL}
-          </span>
-
-          <div className="rounded-xl bg-blue-500/10 p-2">
-            <Send className="h-4 w-4 text-blue-300" />
-          </div>
-        </a>
-      </div>
+     <div className="rounded-[30px] border border-white/10 bg-gradient-to-br from-[#0B1220] to-[#09111E] p-8 shadow-[0_0_60px_rgba(59,130,246,0.06)]">
+  
+  <div className="flex items-start gap-4">
+    
+    <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-blue-500/10">
+      <Mail className="h-6 w-6 text-blue-300" />
     </div>
+
+    <div>
+      <h4 className="text-2xl font-semibold text-white">
+        Support
+      </h4>
+
+      <p className="mt-2 max-w-sm text-sm leading-7 text-gray-400">
+        Need help with billing, account access, or dashboard issues?
+        Our team is available by email.
+      </p>
+    </div>
+  </div>
+
+  <a
+    href={GMAIL_LINK}
+    target="_blank"
+    rel="noopener noreferrer"
+    className="mt-8 flex items-center justify-between rounded-2xl border border-white/10 bg-black/20 px-5 py-5 transition duration-300 hover:border-blue-500/40 hover:bg-blue-500/10"
+  >
+    <span className="text-[15px] font-medium text-blue-300">
+      {SUPPORT_EMAIL}
+    </span>
+
+    <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-blue-500/10">
+      <Send className="h-4 w-4 text-blue-300" />
+    </div>
+  </a>
+</div>
 
     {/* BOTTOM */}
     <div className="mt-14 flex flex-col gap-5 border-t border-white/10 pt-7 text-sm text-gray-500 md:flex-row md:items-center md:justify-between">
