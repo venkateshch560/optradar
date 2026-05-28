@@ -1,3 +1,5 @@
+export const maxDuration = 60;
+
 import { fetchGreenhouseJobs } from "@/lib/fetchGreenhouseJobs";
 import { fetchLeverJobs } from "@/lib/fetchLeverJobs";
 import { fetchAshbyJobs } from "@/lib/fetchAshbyJobs";
@@ -19,7 +21,6 @@ export async function GET(request) {
 
     return Response.json({
       success: true,
-      message: "OPT Radar direct ATS jobs updated",
       saved_jobs: greenhouse + lever + ashby + smartrecruiters,
       sources: {
         greenhouse,
