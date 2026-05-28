@@ -218,7 +218,7 @@ useEffect(() => {
   }
 
  function isFreshJob(job: any) {
-  const dateToCheck = job.posted_at || job.created_at;
+  const dateToCheck = job.first_seen_at || job.posted_at || job.created_at;
 
   if (!dateToCheck) return false;
 
@@ -277,9 +277,10 @@ const filteredJobs = safeJobs
     return true;
   })
   .sort(
-    (a, b) =>
-      new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
-  );
+  (a, b) =>
+    new Date(b.first_seen_at || b.created_at).getTime() -
+    new Date(a.first_seen_at || a.created_at).getTime()
+);
 
   const totalPages = Math.ceil(filteredJobs.length / jobsPerPage);
 
