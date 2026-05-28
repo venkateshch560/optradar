@@ -1,9 +1,6 @@
 export const maxDuration = 60;
 
 import { fetchGreenhouseJobs } from "@/lib/fetchGreenhouseJobs";
-import { fetchLeverJobs } from "@/lib/fetchLeverJobs";
-import { fetchAshbyJobs } from "@/lib/fetchAshbyJobs";
-import { fetchSmartRecruitersJobs } from "@/lib/fetchSmartRecruitersJobs";
 
 export async function GET(request) {
   const { searchParams } = new URL(request.url);
@@ -14,22 +11,19 @@ export async function GET(request) {
   }
 
   try {
+    console.log("STARTING GREENHOUSE FETCH");
+
     const greenhouse = await fetchGreenhouseJobs();
-    const lever = await fetchLeverJobs();
-    const ashby = await fetchAshbyJobs();
-    const smartrecruiters = await fetchSmartRecruitersJobs();
+
+    console.log("GREENHOUSE DONE");
 
     return Response.json({
       success: true,
-      saved_jobs: greenhouse + lever + ashby + smartrecruiters,
-      sources: {
-        greenhouse,
-        lever,
-        ashby,
-        smartrecruiters,
-      },
+      greenhouse,
     });
   } catch (error) {
+    console.error("FETCH ERROR:", error);
+
     return Response.json(
       {
         success: false,
