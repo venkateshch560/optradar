@@ -1,4 +1,3 @@
-import { fetchJobs } from "@/lib/fetchJobs";
 import { fetchGreenhouseJobs } from "@/lib/fetchGreenhouseJobs";
 import { fetchLeverJobs } from "@/lib/fetchLeverJobs";
 import { fetchAshbyJobs } from "@/lib/fetchAshbyJobs";
@@ -18,23 +17,15 @@ export async function GET(request) {
     const ashby = await fetchAshbyJobs();
     const smartrecruiters = await fetchSmartRecruitersJobs();
 
-    let jsearch = 0;
-
-    try {
-      jsearch = await fetchJobs();
-    } catch (err) {
-      console.log("JSEARCH SKIPPED:", err.message);
-    }
-
     return Response.json({
       success: true,
-      saved_jobs: greenhouse + lever + ashby + smartrecruiters + jsearch,
+      message: "OPT Radar direct ATS jobs updated",
+      saved_jobs: greenhouse + lever + ashby + smartrecruiters,
       sources: {
         greenhouse,
         lever,
         ashby,
         smartrecruiters,
-        jsearch,
       },
     });
   } catch (error) {
