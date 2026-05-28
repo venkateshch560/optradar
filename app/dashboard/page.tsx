@@ -15,13 +15,8 @@ export default async function DashboardPage() {
     .order("first_seen_at", { ascending: false })
     .limit(500);
 
-  const { data: savedJobs } = await supabase
-    .from("saved_jobs")
-    .select("*");
-
-  const { data: appliedJobs } = await supabase
-    .from("applied_jobs")
-    .select("*");
+  const { data: savedJobs } = await supabase.from("saved_jobs").select("*");
+  const { data: appliedJobs } = await supabase.from("applied_jobs").select("*");
 
   return (
     <DashboardClient
