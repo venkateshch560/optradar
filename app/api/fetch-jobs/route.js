@@ -300,10 +300,11 @@ export async function GET(request) {
   }
 
   const { data: sources, error: sourceError } = await supabase
-    .from("company_sources")
-    .select("*")
-    .eq("active", true)
-    .limit(100);
+   .from("company_sources")
+.select("*")
+.eq("active", true)
+.not("careers_url", "is", null)
+.limit(100);
 
   if (sourceError) {
     return Response.json({ success: false, error: sourceError.message }, { status: 500 });
