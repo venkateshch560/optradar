@@ -1,6 +1,7 @@
 export const maxDuration = 60;
 
 import { fetchGreenhouseJobs } from "@/lib/fetchGreenhouseJobs";
+
 export async function GET(request) {
   const { searchParams } = new URL(request.url);
   const secret = searchParams.get("secret");
@@ -10,16 +11,17 @@ export async function GET(request) {
   }
 
   try {
-const broadSearch = await fetchGreenhouseJobs();
+    const greenhouse = await fetchGreenhouseJobs();
+
     return Response.json({
       success: true,
-      broadSearch,
+      greenhouse
     });
   } catch (error) {
     return Response.json(
       {
         success: false,
-        error: error.message,
+        error: error.message
       },
       { status: 500 }
     );
