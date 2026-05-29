@@ -1,6 +1,7 @@
 export const maxDuration = 60;
 
 import { createClient } from "@supabase/supabase-js";
+import { fetchWorkday } from "@/lib/fetchWorkday";
 import crypto from "crypto";
 
 const supabase = createClient(
@@ -319,6 +320,9 @@ export async function GET(request) {
       else if (source.ats_platform === "lever") result = await fetchLever(source);
       else if (source.ats_platform === "ashby") result = await fetchAshby(source);
       else if (source.ats_platform === "smartrecruiters") result = await fetchSmartRecruiters(source);
+            else if (source.ats_platform === "workday") {
+      result = await fetchWorkday(source);
+    }
       else {
         debug.push({
           company: source.company_name,
