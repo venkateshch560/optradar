@@ -244,7 +244,31 @@ useEffect(() => {
     setSavedIds((prev) => Array.from(new Set([...prev, job.id])));
     alert("Job saved.");
   }
+async function handleFreeTailor(job: any) {
+  const resumeText = prompt("Paste your resume text here:");
 
+  if (!resumeText) return;
+
+  const res = await fetch("/api/free-tailor-resume", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      resumeText,
+      jobDescription: job.full_page_text || job.description || "",
+    }),
+  });
+
+  const data = await res.json();
+
+  if (!data.success) {
+    alert("Resume tailoring failed");
+    return;
+  }
+
+  alert(data.tailoredResume);
+}
  function isFreshJob(job: any) {
   const dateToCheck = job.first_seen_at || job.posted_at || job.created_at;
 
