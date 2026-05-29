@@ -1,4 +1,7 @@
-import { generateFreeTailoredResume, analyzeResumeMatch } from "@/lib/freeResumeTailor";
+import {
+  generateFreeTailoredResume,
+  analyzeResumeMatch
+} from "@/lib/freeResumeTailor";
 
 export async function POST(request) {
   try {
@@ -12,7 +15,10 @@ export async function POST(request) {
     }
 
     const analysis = analyzeResumeMatch(resumeText, jobDescription);
-    const tailoredResume = generateFreeTailoredResume(resumeText, jobDescription);
+    const tailoredResume = generateFreeTailoredResume(
+      resumeText,
+      jobDescription
+    );
 
     return Response.json({
       success: true,
