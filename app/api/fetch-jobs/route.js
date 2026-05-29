@@ -8,36 +8,11 @@ const supabase = createClient(
   process.env.SUPABASE_SERVICE_ROLE_KEY
 );
 
-const roles = [
-  "Data Analyst",
-  "Junior Data Analyst",
-  "Business Analyst",
-  "Power BI Developer",
-  "Reporting Analyst",
-  "SQL Analyst",
-  "Software Engineer",
-  "Junior Software Engineer",
-  "Frontend Developer",
-  "Backend Developer",
-  "Full Stack Developer",
-  "Data Engineer",
-  "Cloud Engineer",
-  "DevOps Engineer",
-  "QA Engineer",
-  "Systems Analyst",
-  "Cybersecurity Analyst",
-  "SOC Analyst",
-  "SAP Analyst",
-  "IT Support Analyst"
-];
-
-const atsSites = [
-  "greenhouse.io",
-  "lever.co",
-  "ashbyhq.com",
-  "smartrecruiters.com",
-  "myworkdayjobs.com",
-  "icims.com"
+const allowedRoles = [
+  "data", "analyst", "business", "software", "engineer", "developer",
+  "frontend", "backend", "full stack", "cloud", "devops", "qa",
+  "support", "systems", "security", "product", "operations",
+  "machine learning", "ai", "sql", "power bi", "sap", "cyber"
 ];
 
 const blockedWords = [
@@ -52,31 +27,39 @@ const blockedWords = [
   "us persons only"
 ];
 
-function hash(title, company, location, link) {
+function jobHash(title, company, location, link) {
   return crypto
     .createHash("sha256")
     .update(`${title}|${company}|${location}|${link}`.toLowerCase())
     .digest("hex");
 }
 
-function classify(text) {
+function isAllowedRole(title = "") {
+  const t = title.toLowerCase();
+  return allowedRoles.some((r) => t.includes(r));
+}
+
+function classify(text = "") {
   const lower = text.toLowerCase();
 
   if (blockedWords.some((w) => lower.includes(w))) return null;
 
   if (
     lower.includes("opt") ||
-    lower.includes("stem") ||
+    lower.includes("stem opt") ||
     lower.includes("f-1") ||
+    lower.includes("cpt") ||
     lower.includes("ead") ||
     lower.includes("visa sponsorship") ||
+    lower.includes("h-1b") ||
     lower.includes("e-verify")
   ) {
     return {
       opt_status: "OPT Friendly",
       opt_risk_level: "Low Risk",
       sponsorship_chance: "High",
-      apply_confidence: 90
+      apply_confidence: 90,
+      opt_risk_reason: ""
     };
   }
 
@@ -89,7 +72,8 @@ function classify(text) {
       opt_status: "Apply Carefully",
       opt_risk_level: "Medium Risk",
       sponsorship_chance: "Medium",
-      apply_confidence: 70
+      apply_confidence: 70,
+      opt_risk_reason: "Sponsorship unclear"
     };
   }
 
@@ -97,36 +81,214 @@ function classify(text) {
     opt_status: "Possible OPT",
     opt_risk_level: "Medium Risk",
     sponsorship_chance: "Medium",
-    apply_confidence: 80
+    apply_confidence: 80,
+    opt_risk_reason: "No clear OPT/sponsorship language"
   };
 }
 
-function category(title) {
+function roleCategory(title = "") {
   const t = title.toLowerCase();
-  if (t.includes("data") || t.includes("analyst") || t.includes("sql") || t.includes("power bi")) return "Data / Analytics";
-  if (t.includes("software") || t.includes("developer") || t.includes("engineer")) return "Software / Engineering";
+
+  if (t.includes("data") || t.includes("analyst") || t.includes("bi") || t.includes("sql")) {
+    return "Data / Analytics";
+  }
+
+  if (t.includes("software") || t.includes("engineer") || t.includes("developer")) {
+    return "Software / Engineering";
+  }
+
   if (t.includes("cloud") || t.includes("devops")) return "Cloud / DevOps";
-  if (t.includes("support")) return "IT Support";
+  if (t.includes("support") || t.includes("help desk")) return "IT Support";
   if (t.includes("security") || t.includes("soc")) return "Cybersecurity";
+  if (t.includes("product") || t.includes("business")) return "Business / Product";
+  if (t.includes("sap") || t.includes("erp")) return "ERP / SAP";
+
   return "Other";
 }
 
-function atsName(url) {
-  const u = url.toLowerCase();
-  if (u.includes("greenhouse")) return "Greenhouse";
-  if (u.includes("lever")) return "Lever";
-  if (u.includes("ashby")) return "Ashby";
-  if (u.includes("smartrecruiters")) return "SmartRecruiters";
-  if (u.includes("workday")) return "Workday";
-  if (u.includes("icims")) return "iCIMS";
-  return "Career Site";
+function experience(title = "") {
+  const t = title.toLowerCase();
+
+  if (t.includes("junior") || t.includes("entry") || t.includes("associate") || t.includes("new grad")) {
+    return { level: "Entry Level", years: 0 };
+  }
+
+  if (t.includes("senior") || t.includes("sr.") || t.includes("principal")) {
+    return { level: "Senior", years: 6 };
+  }
+
+  if (t.includes("manager") || t.includes("lead") || t.includes("director")) {
+    return { level: "Lead / Manager", years: 8 };
+  }
+
+  return { level: "Experience not listed by employer", years: null };
 }
 
-async function searchRole(role, site) {
-  const query = encodeURIComponent(`site:${site} "${role}" jobs United States`);
-  const url = `https://www.google.com/search?q=${query}`;
+function normalizeJob({
+  title,
+  company,
+  location,
+  description,
+  applyLink,
+  source,
+  postedAt
+}) {
+  if (!title || !applyLink) return null;
+  if (!isAllowedRole(title)) return null;
 
-  return [];
+  const opt = classify(`${title} ${company} ${location} ${description}`);
+  if (!opt) return null;
+
+  const exp = experience(title);
+
+  return {
+    title,
+    company,
+    location: location || "United States",
+    description: description || "",
+    full_page_text: description || "",
+    apply_link: applyLink,
+    apply_url: applyLink,
+    job_hash: jobHash(title, company, location || "United States", applyLink),
+    source,
+    posted_at: postedAt || new Date().toISOString(),
+    first_seen_at: new Date().toISOString(),
+    last_seen_at: new Date().toISOString(),
+    opt_status: opt.opt_status,
+    opt_risk_level: opt.opt_risk_level,
+    opt_risk_reason: opt.opt_risk_reason,
+    risk_reason: opt.opt_risk_reason,
+    sponsorship_chance: opt.sponsorship_chance,
+    apply_confidence: opt.apply_confidence,
+    experience_level: exp.level,
+    experience_years: exp.years,
+    is_fresh: true,
+    is_active: true,
+    remote:
+      title.toLowerCase().includes("remote") ||
+      (location || "").toLowerCase().includes("remote"),
+    salary: "",
+    scraped_at: new Date().toISOString(),
+    is_direct_employer: true,
+    source_type: "direct_employer_career_site",
+    excluded_reason: "",
+    freshness_label: "Fresh",
+    role_category: roleCategory(title),
+    apply_ease: "Direct Apply",
+    ats_platform: source,
+    company_domain: ""
+  };
+}
+
+async function fetchGreenhouse(source) {
+  const res = await fetch(
+    `https://boards-api.greenhouse.io/v1/boards/${source.ats_slug}/jobs?content=true`,
+    { cache: "no-store" }
+  );
+
+  if (!res.ok) return { rows: [], found: 0, error: `Greenhouse ${res.status}` };
+
+  const data = await res.json();
+  const jobs = data.jobs || [];
+
+  const rows = jobs
+    .map((job) =>
+      normalizeJob({
+        title: job.title,
+        company: source.company_name,
+        location: job.location?.name || "United States",
+        description: job.content || "",
+        applyLink: job.absolute_url,
+        source: "Greenhouse",
+        postedAt: job.updated_at
+      })
+    )
+    .filter(Boolean);
+
+  return { rows, found: jobs.length };
+}
+
+async function fetchLever(source) {
+  const res = await fetch(
+    `https://api.lever.co/v0/postings/${source.ats_slug}?mode=json`,
+    { cache: "no-store" }
+  );
+
+  if (!res.ok) return { rows: [], found: 0, error: `Lever ${res.status}` };
+
+  const jobs = await res.json();
+
+  const rows = (jobs || [])
+    .map((job) =>
+      normalizeJob({
+        title: job.text,
+        company: source.company_name,
+        location: job.categories?.location || "United States",
+        description: job.descriptionPlain || job.description || "",
+        applyLink: job.hostedUrl,
+        source: "Lever",
+        postedAt: job.createdAt ? new Date(job.createdAt).toISOString() : null
+      })
+    )
+    .filter(Boolean);
+
+  return { rows, found: jobs.length };
+}
+
+async function fetchAshby(source) {
+  const res = await fetch(
+    `https://api.ashbyhq.com/posting-api/job-board/${source.ats_slug}`,
+    { cache: "no-store" }
+  );
+
+  if (!res.ok) return { rows: [], found: 0, error: `Ashby ${res.status}` };
+
+  const data = await res.json();
+  const jobs = data.jobs || [];
+
+  const rows = jobs
+    .map((job) =>
+      normalizeJob({
+        title: job.title,
+        company: source.company_name,
+        location: job.location || "United States",
+        description: job.descriptionPlain || job.descriptionHtml || "",
+        applyLink: job.jobUrl,
+        source: "Ashby",
+        postedAt: job.publishedAt
+      })
+    )
+    .filter(Boolean);
+
+  return { rows, found: jobs.length };
+}
+
+async function fetchSmartRecruiters(source) {
+  const res = await fetch(
+    `https://api.smartrecruiters.com/v1/companies/${source.ats_slug}/postings?limit=100`,
+    { cache: "no-store" }
+  );
+
+  if (!res.ok) return { rows: [], found: 0, error: `SmartRecruiters ${res.status}` };
+
+  const data = await res.json();
+  const jobs = data.content || [];
+
+  const rows = jobs
+    .map((job) =>
+      normalizeJob({
+        title: job.name,
+        company: source.company_name,
+        location: job.location?.city || job.location?.country || "United States",
+        description: job.refNumber || "",
+        applyLink: job.ref,
+        source: "SmartRecruiters",
+        postedAt: job.releasedDate
+      })
+    )
+    .filter(Boolean);
+
+  return { rows, found: jobs.length };
 }
 
 export async function GET(request) {
@@ -136,70 +298,90 @@ export async function GET(request) {
     return Response.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  const rows = [];
+  const { data: sources, error: sourceError } = await supabase
+    .from("company_sources")
+    .select("*")
+    .eq("active", true)
+    .limit(100);
 
-  for (const role of roles) {
-    for (const site of atsSites) {
-      const fakeSearchUrl = `https://${site}/search?q=${encodeURIComponent(role)}`;
+  if (sourceError) {
+    return Response.json({ success: false, error: sourceError.message }, { status: 500 });
+  }
 
-      const opt = classify(role);
-      if (!opt) continue;
+  let totalSaved = 0;
+  const debug = [];
 
-      const title = role;
-      const company = "Direct ATS Search";
-      const location = "United States";
-      const applyLink = fakeSearchUrl;
+  for (const source of sources || []) {
+    let result = { rows: [], found: 0 };
 
-      rows.push({
-        title,
-        company,
-        location,
-        description: `${role} openings from ${site}.`,
-        full_page_text: `${role} openings from ${site}.`,
-        apply_link: applyLink,
-        apply_url: applyLink,
-        job_hash: hash(title, company, location, applyLink),
-        source: "Role Search",
-        posted_at: new Date().toISOString(),
-        first_seen_at: new Date().toISOString(),
-        last_seen_at: new Date().toISOString(),
-        opt_status: opt.opt_status,
-        opt_risk_level: opt.opt_risk_level,
-        opt_risk_reason: "Role-based ATS search",
-        risk_reason: "Role-based ATS search",
-        sponsorship_chance: opt.sponsorship_chance,
-        apply_confidence: opt.apply_confidence,
-        experience_level: title.toLowerCase().includes("junior") ? "Entry Level" : "Experience not listed by employer",
-        experience_years: title.toLowerCase().includes("junior") ? 0 : null,
-        is_fresh: true,
-        is_active: true,
-        remote: false,
-        salary: "",
-        scraped_at: new Date().toISOString(),
-        is_direct_employer: true,
-        source_type: "ats_role_search",
-        excluded_reason: "",
-        freshness_label: "Fresh",
-        role_category: category(title),
-        apply_ease: "Direct Search",
-        ats_platform: atsName(fakeSearchUrl),
-        company_domain: site
+    try {
+      if (source.ats_platform === "greenhouse") result = await fetchGreenhouse(source);
+      else if (source.ats_platform === "lever") result = await fetchLever(source);
+      else if (source.ats_platform === "ashby") result = await fetchAshby(source);
+      else if (source.ats_platform === "smartrecruiters") result = await fetchSmartRecruiters(source);
+      else {
+        debug.push({
+          company: source.company_name,
+          ats: source.ats_platform,
+          saved: 0,
+          error: "ATS not supported yet"
+        });
+        continue;
+      }
+
+      const uniqueRows = Array.from(
+        new Map(result.rows.map((row) => [row.job_hash, row])).values()
+      );
+
+      if (uniqueRows.length > 0) {
+        const { error } = await supabase.from("jobs").upsert(uniqueRows, {
+          onConflict: "job_hash",
+          ignoreDuplicates: true
+        });
+
+        if (error) {
+          debug.push({
+            company: source.company_name,
+            ats: source.ats_platform,
+            found: result.found,
+            prepared: uniqueRows.length,
+            saved: 0,
+            error: error.message
+          });
+        } else {
+          totalSaved += uniqueRows.length;
+          debug.push({
+            company: source.company_name,
+            ats: source.ats_platform,
+            found: result.found,
+            prepared: uniqueRows.length,
+            saved: uniqueRows.length
+          });
+        }
+      } else {
+        debug.push({
+          company: source.company_name,
+          ats: source.ats_platform,
+          found: result.found,
+          prepared: 0,
+          saved: 0,
+          error: result.error || null
+        });
+      }
+    } catch (err) {
+      debug.push({
+        company: source.company_name,
+        ats: source.ats_platform,
+        saved: 0,
+        error: err.message
       });
     }
   }
 
-  const { error } = await supabase.from("jobs").upsert(rows, {
-    onConflict: "job_hash",
-    ignoreDuplicates: true
-  });
-
-  if (error) {
-    return Response.json({ success: false, error: error.message }, { status: 500 });
-  }
-
   return Response.json({
     success: true,
-    saved: rows.length,
-    message: "Role-based jobs inserted"
+    totalSaved,
+    sourcesChecked: sources?.length || 0,
+    debug
   });
 }
