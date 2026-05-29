@@ -46,6 +46,7 @@ export default function DashboardClient({
   const [savedIds, setSavedIds] = useState<any[]>([]);
   const [appliedIds, setAppliedIds] = useState<any[]>([]);
   const [currentPage, setCurrentPage] = useState(1);
+  const [tailoredResume, setTailoredResume] = useState("");
 
   const jobsPerPage = 20;
 
@@ -203,6 +204,33 @@ useEffect(() => {
       alert("Please login again.");
       return;
     }
+    async function handleFreeTailor(job: any) {
+  const resumeText = prompt(
+    "Paste your resume text here:"
+  );
+
+  if (!resumeText) return;
+
+  const res = await fetch("/api/free-tailor-resume", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      resumeText,
+      jobDescription: job.full_page_text || job.description || "",
+    }),
+  });
+
+  const data = await res.json();
+
+  if (!data.success) {
+    alert("Resume tailoring failed");
+    return;
+  }
+
+  setTailoredResume(data.tailoredResume);
+}
 
     await fetch("/api/save-job", {
       method: "POST",
@@ -711,6 +739,17 @@ const filteredJobs = safeJobs
 
                   <p className="text-xs text-gray-500">20 jobs per page</p>
                 </div>
+                {tailoredResume && (
+  <div className="mb-6 rounded-3xl border border-purple-500/20 bg-purple-500/10 p-6">
+    <h3 className="mb-3 text-xl font-bold">
+      Tailored Resume Suggestions
+    </h3>
+
+    <pre className="whitespace-pre-wrap text-sm text-gray-300">
+      {tailoredResume}
+    </pre>
+  </div>
+)}
 
                 <div className="grid gap-4">
                   {paginatedJobs.map((job, index) => {
@@ -834,6 +873,12 @@ const filteredJobs = safeJobs
                               <Bookmark className="h-4 w-4" />
                               {isSaved ? "Saved ✓" : "Save Job"}
                             </button>
+                            <button
+  onClick={() => handleFreeTailor(job)}
+  className="mb-3 flex w-full items-center justify-center gap-2 rounded-xl bg-purple-600 px-5 py-3 text-center font-semibold text-white hover:bg-purple-700"
+>
+  ✨ Tailor Resume
+</button>
 
                             <button
                               onClick={() => {
