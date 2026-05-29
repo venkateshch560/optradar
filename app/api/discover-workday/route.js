@@ -7,31 +7,22 @@ const supabase = createClient(
   process.env.SUPABASE_SERVICE_ROLE_KEY
 );
 
-function possibleWorkdayUrls(slug) {
+function generateUrls(slug) {
   return [
     `https://${slug}.wd1.myworkdayjobs.com/External`,
     `https://${slug}.wd1.myworkdayjobs.com/Careers`,
     `https://${slug}.wd1.myworkdayjobs.com/en-US/External`,
-    `https://${slug}.wd1.myworkdayjobs.com/en-US/Careers`,
-
-    `https://${slug}.wd3.myworkdayjobs.com/External`,
-    `https://${slug}.wd3.myworkdayjobs.com/Careers`,
-    `https://${slug}.wd3.myworkdayjobs.com/en-US/External`,
-    `https://${slug}.wd3.myworkdayjobs.com/en-US/Careers`,
-
     `https://${slug}.wd5.myworkdayjobs.com/External`,
     `https://${slug}.wd5.myworkdayjobs.com/Careers`,
-    `https://${slug}.wd5.myworkdayjobs.com/en-US/External`,
-    `https://${slug}.wd5.myworkdayjobs.com/en-US/Careers`
+    `https://${slug}.wd5.myworkdayjobs.com/en-US/External`
   ];
 }
 
-async function isValidWorkdayUrl(url) {
+async function validate(url) {
   try {
     const res = await fetch(url, {
-      method: "GET",
-      redirect: "follow",
       cache: "no-store",
+      redirect: "follow",
       headers: {
         "User-Agent": "Mozilla/5.0"
       }
@@ -43,9 +34,7 @@ async function isValidWorkdayUrl(url) {
 
     return (
       html.includes("workday") ||
-      html.includes("myworkdayjobs") ||
-      html.includes("__NEXT_DATA__") ||
-      html.includes("wday")
+      html.includes("myworkdayjobs")
     );
   } catch {
     return false;
@@ -59,58 +48,43 @@ export async function GET(request) {
     return Response.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  const { data: sources, error } = await supabase
+  const { data: companies } = await supabase
     .from("company_sources")
     .select("*")
     .eq("ats_platform", "workday")
     .is("careers_url", null)
-    .eq("active", true)
     .limit(20);
 
-  if (error) {
-    return Response.json({ success: false, error: error.message });
-  }
+  const results = [];
 
-  const debug = [];
+  for (const company of companies || []) {
+    let found = null;
 
-  for (const source of sources || []) {
-    const slug = source.ats_slug;
-    const candidates = possibleWorkdayUrls(slug);
+    for (const url of generateUrls(company.ats_slug)) {
+      const ok = await validate(url);
 
-    let foundUrl = null;
-
-    for (const url of candidates) {
-      const valid = await isValidWorkdayUrl(url);
-
-      if (valid) {
-        foundUrl = url;
+      if (ok) {
+        found = url;
         break;
       }
     }
 
-    if (foundUrl) {
+    if (found) {
       await supabase
         .from("company_sources")
-        .update({ careers_url: foundUrl })
-        .eq("id", source.id);
-
-      debug.push({
-        company: source.company_name,
-        slug,
-        found: foundUrl
-      });
-    } else {
-      debug.push({
-        company: source.company_name,
-        slug,
-        found: null
-      });
+        .update({ careers_url: found })
+        .eq("id", company.id);
     }
+
+    results.push({
+      company: company.company_name,
+      found
+    });
   }
 
   return Response.json({
     success: true,
-    checked: sources?.length || 0,
-    debug
+    checked: results.length,
+    results
   });
 }
