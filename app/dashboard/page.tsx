@@ -7,13 +7,17 @@ const supabase = createClient(
 );
 
 export default async function DashboardPage() {
+  const sevenDaysAgo = new Date();
+  sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
+
   const { data: jobs } = await supabase
     .from("jobs")
     .select("*")
     .neq("opt_status", "Not Eligible")
     .eq("is_active", true)
+    .gte("first_seen_at", sevenDaysAgo.toISOString())
     .order("first_seen_at", { ascending: false })
-    .limit(500);
+    .limit(1000);
 
   const { data: savedJobs } = await supabase.from("saved_jobs").select("*");
   const { data: appliedJobs } = await supabase.from("applied_jobs").select("*");
