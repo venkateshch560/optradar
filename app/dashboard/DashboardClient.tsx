@@ -50,29 +50,29 @@ export default function DashboardClient({
 
   const jobsPerPage = 20;
 
- const [lastRefreshed, setLastRefreshed] = useState(
-  new Date().toLocaleTimeString([], {
-    hour: "2-digit",
-    minute: "2-digit",
-  })
-);
-
-useEffect(() => {
-  const interval = setInterval(() => {
-    window.location.reload();
-  }, 60 * 60 * 1000);
-
-  return () => clearInterval(interval);
-}, []);
-
-useEffect(() => {
-  setLastRefreshed(
+  const [lastRefreshed, setLastRefreshed] = useState(
     new Date().toLocaleTimeString([], {
       hour: "2-digit",
       minute: "2-digit",
     })
   );
-}, []);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      window.location.reload();
+    }, 60 * 60 * 1000);
+
+    return () => clearInterval(interval);
+  }, []);
+
+  useEffect(() => {
+    setLastRefreshed(
+      new Date().toLocaleTimeString([], {
+        hour: "2-digit",
+        minute: "2-digit",
+      })
+    );
+  }, []);
 
   const safeJobs = jobs || [];
   const now = Date.now();
@@ -204,33 +204,6 @@ useEffect(() => {
       alert("Please login again.");
       return;
     }
-    async function handleFreeTailor(job: any) {
-  const resumeText = prompt(
-    "Paste your resume text here:"
-  );
-
-  if (!resumeText) return;
-
-  const res = await fetch("/api/free-tailor-resume", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({
-      resumeText,
-      jobDescription: job.full_page_text || job.description || "",
-    }),
-  });
-
-  const data = await res.json();
-
-  if (!data.success) {
-    alert("Resume tailoring failed");
-    return;
-  }
-
-  setTailoredResume(data.tailoredResume);
-}
 
     await fetch("/api/save-job", {
       method: "POST",
@@ -244,95 +217,118 @@ useEffect(() => {
     setSavedIds((prev) => Array.from(new Set([...prev, job.id])));
     alert("Job saved.");
   }
-async function handleFreeTailor(job: any) {
-  const resumeText = prompt("Paste your resume text here:");
 
-  if (!resumeText) return;
+  async function handleFreeTailor(job: any) {
+    const resumeText = prompt("Paste your resume text here:");
 
-  const res = await fetch("/api/free-tailor-resume", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({
-      resumeText,
-      jobDescription: job.full_page_text || job.description || "",
-    }),
-  });
+    if (!resumeText) return;
 
-  const data = await res.json();
+    const res = await fetch("/api/free-tailor-resume", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        resumeText,
+        jobDescription: job.full_page_text || job.description || "",
+      }),
+    });
 
-  if (!data.success) {
-    alert("Resume tailoring failed");
-    return;
+    const data = await res.json();
+
+    if (!data.success) {
+      alert("Resume tailoring failed");
+      return;
+    }
+
+    setTailoredResume(data.tailoredResume);
   }
 
-  alert(data.tailoredResume);
-}
- function isFreshJob(job: any) {
-  const dateToCheck = job.first_seen_at || job.posted_at || job.created_at;
+  function getJobAgeGroup(job: any) {
+    const dateToCheck = job.first_seen_at || job.posted_at || job.created_at;
 
-  if (!dateToCheck) return false;
+    if (!dateToCheck) return "old";
 
-  const jobTime = new Date(dateToCheck).getTime();
+    const jobTime = new Date(dateToCheck).getTime();
 
-  if (Number.isNaN(jobTime)) return false;
+    if (Number.isNaN(jobTime)) return "old";
 
-  return now - jobTime <= 24 * 60 * 60 * 1000;
-}
+    const diff = now - jobTime;
+    const oneDay = 24 * 60 * 60 * 1000;
 
- const freshJobs = safeJobs.filter((job) => isFreshJob(job));
-const olderJobs = safeJobs.filter((job) => !isFreshJob(job));
+    if (diff <= oneDay) return "fresh";
+    if (diff <= 3 * oneDay) return "recent";
+    if (diff <= 7 * oneDay) return "week";
 
-const stats = useMemo(() => {
-  return {
-    fresh: freshJobs.length,
-    archive: olderJobs.length,
-    saved: savedIds.length,
-    applied: appliedIds.length,
-    lowRisk: freshJobs.filter((job) => job.opt_risk_level === "Low Risk")
-      .length,
-  };
-}, [safeJobs, savedIds, appliedIds]);
+    return "old";
+  }
 
-const filteredJobs = safeJobs
-  .filter((job) => {
-    const fresh = isFreshJob(job);
+  function isFreshJob(job: any) {
+    return getJobAgeGroup(job) === "fresh";
+  }
 
-    if (quickFilter === "dashboard") return false;
-    if (quickFilter === "fresh" && !fresh) return false;
-    if (quickFilter === "archive" && fresh) return false;
-    if (quickFilter === "entry" && job.experience_level !== "Entry Level")
-      return false;
-    if (quickFilter === "remote" && job.remote !== true) return false;
-    if (quickFilter === "lowrisk" && job.opt_risk_level !== "Low Risk")
-      return false;
-    if (quickFilter === "strong" && (job.apply_confidence || 50) < 75)
-      return false;
-    if (quickFilter === "saved" && !savedIds.includes(job.id)) return false;
-    if (quickFilter === "applied" && !appliedIds.includes(job.id))
-      return false;
+  const freshJobs = safeJobs.filter(
+    (job) => getJobAgeGroup(job) === "fresh"
+  );
 
-    if (title && !job.title?.toLowerCase().includes(title.toLowerCase()))
-      return false;
+  const recentJobs = safeJobs.filter(
+    (job) => getJobAgeGroup(job) === "recent"
+  );
 
-    if (
-      location &&
-      !job.location?.toLowerCase().includes(location.toLowerCase())
-    )
-      return false;
+  const weekJobs = safeJobs.filter((job) => getJobAgeGroup(job) === "week");
 
-    if (experience && job.experience_level !== experience) return false;
-    if (category && job.role_category !== category) return false;
-    if (risk && job.opt_risk_level !== risk) return false;
+  const stats = useMemo(() => {
+    return {
+      fresh: freshJobs.length,
+      recent: recentJobs.length,
+      week: weekJobs.length,
+      saved: savedIds.length,
+      applied: appliedIds.length,
+      lowRisk: freshJobs.filter((job) => job.opt_risk_level === "Low Risk")
+        .length,
+    };
+  }, [safeJobs, savedIds, appliedIds]);
 
-    return true;
-  })
-  .sort(
-  (a, b) =>
-    new Date(b.first_seen_at || b.created_at).getTime() -
-    new Date(a.first_seen_at || a.created_at).getTime()
-);
+  const filteredJobs = safeJobs
+    .filter((job) => {
+      const ageGroup = getJobAgeGroup(job);
+
+      if (ageGroup === "old") return false;
+
+      if (quickFilter === "dashboard") return false;
+      if (quickFilter === "fresh" && ageGroup !== "fresh") return false;
+      if (quickFilter === "archive" && ageGroup === "fresh") return false;
+      if (quickFilter === "entry" && job.experience_level !== "Entry Level")
+        return false;
+      if (quickFilter === "remote" && job.remote !== true) return false;
+      if (quickFilter === "lowrisk" && job.opt_risk_level !== "Low Risk")
+        return false;
+      if (quickFilter === "strong" && (job.apply_confidence || 50) < 75)
+        return false;
+      if (quickFilter === "saved" && !savedIds.includes(job.id)) return false;
+      if (quickFilter === "applied" && !appliedIds.includes(job.id))
+        return false;
+
+      if (title && !job.title?.toLowerCase().includes(title.toLowerCase()))
+        return false;
+
+      if (
+        location &&
+        !job.location?.toLowerCase().includes(location.toLowerCase())
+      )
+        return false;
+
+      if (experience && job.experience_level !== experience) return false;
+      if (category && job.role_category !== category) return false;
+      if (risk && job.opt_risk_level !== risk) return false;
+
+      return true;
+    })
+    .sort(
+      (a, b) =>
+        new Date(b.first_seen_at || b.created_at).getTime() -
+        new Date(a.first_seen_at || a.created_at).getTime()
+    );
 
   const totalPages = Math.ceil(filteredJobs.length / jobsPerPage);
 
@@ -415,10 +411,18 @@ const filteredJobs = safeJobs
     return `${job.experience_level} • ${job.experience_years}+ yrs`;
   }
 
+  function ageBadge(job: any) {
+    const ageGroup = getJobAgeGroup(job);
+
+    if (ageGroup === "fresh") return "Fresh • 24h";
+    if (ageGroup === "recent") return "Last 3 Days";
+    return "Last 7 Days";
+  }
+
   const navItems = [
     { id: "dashboard", label: "Dashboard", icon: Home },
     { id: "fresh", label: "Fresh Jobs", icon: Clock3 },
-    { id: "archive", label: "All Jobs", icon: FolderOpen },
+    { id: "archive", label: "Last 7 Days", icon: FolderOpen },
     { id: "entry", label: "Entry Level", icon: GraduationCap },
     { id: "remote", label: "Remote Jobs", icon: MapPin },
     { id: "lowrisk", label: "Low-Risk Jobs", icon: ShieldCheck },
@@ -503,15 +507,15 @@ const filteredJobs = safeJobs
                   </h1>
 
                   <p className="mt-4 max-w-3xl text-lg leading-8 text-gray-400">
-                    Hourly-updated OPT/STEM OPT opportunities with official
-                    company career links, apply confidence scoring, low-risk
-                    filtering, and application tracking.
+                    Fresh OPT/STEM OPT opportunities with official company
+                    career links, apply confidence scoring, low-risk filtering,
+                    resume tailoring, and application tracking.
                   </p>
 
                   <div className="mt-5 flex flex-wrap gap-3">
                     <div className="inline-flex items-center gap-2 rounded-full border border-green-500/20 bg-green-500/10 px-4 py-2 text-sm text-green-300">
                       <span className="h-2 w-2 rounded-full bg-green-400" />
-                      Fresh jobs refresh automatically every hour
+                      Fresh jobs = posted within 24 hours
                     </div>
 
                     <div className="inline-flex items-center gap-2 rounded-full border border-blue-500/20 bg-blue-500/10 px-4 py-2 text-sm text-blue-300">
@@ -520,54 +524,46 @@ const filteredJobs = safeJobs
                   </div>
                 </div>
 
-        <div className="flex flex-wrap gap-3">
-  <button
-    onClick={resetFilters}
-    className="rounded-xl border border-white/10 px-4 py-3 text-sm hover:bg-white/5"
-  >
-    Dashboard Home
-  </button>
+                <div className="flex flex-wrap gap-3">
+                  <button
+                    onClick={resetFilters}
+                    className="rounded-xl border border-white/10 px-4 py-3 text-sm hover:bg-white/5"
+                  >
+                    Dashboard Home
+                  </button>
 
-  <button
-    onClick={logout}
-    className="flex items-center justify-center gap-2 rounded-xl border border-red-500/20 bg-red-500/10 px-4 py-3 text-sm text-red-300 hover:bg-red-500/20"
-  >
-    <LogOut className="h-4 w-4" />
-    Logout
-  </button>
-</div>
+                  <button
+                    onClick={logout}
+                    className="flex items-center justify-center gap-2 rounded-xl border border-red-500/20 bg-red-500/10 px-4 py-3 text-sm text-red-300 hover:bg-red-500/20"
+                  >
+                    <LogOut className="h-4 w-4" />
+                    Logout
+                  </button>
+                </div>
+              </div>
 
-</div>
+              <div className="mt-8 grid gap-4 sm:grid-cols-2 xl:grid-cols-6">
+                {[
+                  ["Fresh 24h", stats.fresh, Clock3],
+                  ["Last 3 Days", stats.recent, FolderOpen],
+                  ["Last 7 Days", stats.week, FolderOpen],
+                  ["Saved Jobs", stats.saved, Bookmark],
+                  ["Applied Jobs", stats.applied, Send],
+                  ["Low OPT Risk", stats.lowRisk, ShieldCheck],
+                ].map(([label, value, Icon]: any) => (
+                  <div
+                    key={label}
+                    className="rounded-3xl border border-white/10 bg-gradient-to-br from-white/[0.07] to-white/[0.02] p-5 shadow-xl"
+                  >
+                    <div className="mb-3 flex items-center gap-3">
+                      <Icon className="h-5 w-5 text-blue-300" />
+                      <p className="text-sm text-gray-400">{label}</p>
+                    </div>
 
-<div className="mt-8 grid gap-4 sm:grid-cols-2 xl:grid-cols-6">
-  {[
-    ["Fresh Jobs", stats.fresh, Clock3],
-    ["All Jobs", stats.archive, FolderOpen],
-    ["Saved Jobs", stats.saved, Bookmark],
-    ["Applied Jobs", stats.applied, Send],
-    ["Low OPT Risk", stats.lowRisk, ShieldCheck],
-  ].map(([label, value, Icon]: any) => (
-    <div
-      key={label}
-      className="rounded-3xl border border-white/10 bg-gradient-to-br from-white/[0.07] to-white/[0.02] p-5 shadow-xl"
-    >
-      <div className="mb-3 flex items-center gap-3">
-        <Icon className="h-5 w-5 text-blue-300" />
-        <p className="text-sm text-gray-400">{label}</p>
-      </div>
-
-      <p className="text-3xl font-bold">{value}</p>
-    </div>
-  ))}
-
-  <div className="rounded-3xl border border-green-500/20 bg-green-500/10 p-5 shadow-xl">
-    <p className="text-sm text-green-300">Subscription</p>
-
-    <p className="mt-2 text-2xl font-bold text-green-300">
-      ACTIVE
-    </p>
-  </div>
-</div>
+                    <p className="text-3xl font-bold">{value}</p>
+                  </div>
+                ))}
+              </div>
 
               <div className="mt-6 rounded-3xl border border-white/10 bg-[#0B1020]/80 p-5 shadow-xl">
                 <h3 className="text-lg font-bold">Apply Confidence Guide</h3>
@@ -598,9 +594,9 @@ const filteredJobs = safeJobs
                   </h2>
 
                   <p className="mt-4 text-gray-400 leading-7">
-                    Start with Fresh Jobs, save roles you like, apply on the
-                    company site, and when you return, OPT Radar will ask
-                    whether you applied and move it into Applied Jobs.
+                    Start with Fresh Jobs, save roles you like, tailor your
+                    resume, apply on the company site, and track everything in
+                    Saved and Applied Jobs.
                   </p>
 
                   <div className="mt-8 grid gap-4 md:grid-cols-2">
@@ -621,10 +617,10 @@ const filteredJobs = safeJobs
                       className="rounded-2xl border border-gray-500/20 bg-gray-500/10 p-6 text-left hover:bg-gray-500/20"
                     >
                       <p className="text-xl font-bold text-gray-300">
-                        All Jobs
+                        Last 7 Days
                       </p>
                       <p className="mt-2 text-sm text-gray-300">
-                        Older roles and complete job database for later review.
+                        All jobs collected within the last week.
                       </p>
                     </button>
 
@@ -660,8 +656,8 @@ const filteredJobs = safeJobs
                   <div className="mt-6 space-y-4 text-gray-300">
                     <p>1. Open Fresh Jobs.</p>
                     <p>2. Save jobs you like.</p>
-                    <p>3. Click Apply on Company Site.</p>
-                    <p>4. Return and confirm if you applied.</p>
+                    <p>3. Tailor your resume.</p>
+                    <p>4. Click Apply on Company Site.</p>
                     <p>5. Track everything in Saved and Applied Jobs.</p>
                   </div>
                 </div>
@@ -737,9 +733,9 @@ const filteredJobs = safeJobs
                       value={view}
                       onChange={(e) => setView(e.target.value)}
                     >
-                      <option value="all">All Jobs in Section</option>
+                      <option value="all">All Jobs</option>
                       <option value="fresh">Fresh — Last 24h</option>
-                      <option value="archive">All Jobs</option>
+                      <option value="archive">Last 7 Days</option>
                     </select>
 
                     <button
@@ -763,17 +759,18 @@ const filteredJobs = safeJobs
 
                   <p className="text-xs text-gray-500">20 jobs per page</p>
                 </div>
-                {tailoredResume && (
-  <div className="mb-6 rounded-3xl border border-purple-500/20 bg-purple-500/10 p-6">
-    <h3 className="mb-3 text-xl font-bold">
-      Tailored Resume Suggestions
-    </h3>
 
-    <pre className="whitespace-pre-wrap text-sm text-gray-300">
-      {tailoredResume}
-    </pre>
-  </div>
-)}
+                {tailoredResume && (
+                  <div className="mb-6 rounded-3xl border border-purple-500/20 bg-purple-500/10 p-6">
+                    <h3 className="mb-3 text-xl font-bold">
+                      Tailored Resume Suggestions
+                    </h3>
+
+                    <pre className="whitespace-pre-wrap text-sm text-gray-300">
+                      {tailoredResume}
+                    </pre>
+                  </div>
+                )}
 
                 <div className="grid gap-4">
                   {paginatedJobs.map((job, index) => {
@@ -790,7 +787,7 @@ const filteredJobs = safeJobs
                           <div className="flex-1">
                             <div className="mb-3 flex flex-wrap gap-2">
                               <span className="rounded-full bg-green-500/15 px-3 py-1 text-xs font-medium text-green-300">
-                                {isFreshJob(job) ? "Fresh" : "Archive"}
+                                {ageBadge(job)}
                               </span>
 
                               <span className="rounded-full bg-blue-500/15 px-3 py-1 text-xs font-medium text-blue-300">
@@ -841,7 +838,13 @@ const filteredJobs = safeJobs
                             <div className="mt-3 flex flex-wrap gap-3 text-sm text-gray-500">
                               <span>{job.location || "Location not listed"}</span>
                               <span>•</span>
-                              <span>{formatDate(job.created_at)}</span>
+                              <span>
+                                {formatDate(
+                                  job.first_seen_at ||
+                                    job.posted_at ||
+                                    job.created_at
+                                )}
+                              </span>
                               <span>•</span>
                               <span>{job.role_category || "Other"}</span>
                               <span>•</span>
@@ -897,12 +900,13 @@ const filteredJobs = safeJobs
                               <Bookmark className="h-4 w-4" />
                               {isSaved ? "Saved ✓" : "Save Job"}
                             </button>
+
                             <button
-  onClick={() => handleFreeTailor(job)}
-  className="mb-3 flex w-full items-center justify-center gap-2 rounded-xl bg-purple-600 px-5 py-3 text-center font-semibold text-white hover:bg-purple-700"
->
-  ✨ Tailor Resume
-</button>
+                              onClick={() => handleFreeTailor(job)}
+                              className="mb-3 flex w-full items-center justify-center gap-2 rounded-xl bg-purple-600 px-5 py-3 text-center font-semibold text-white hover:bg-purple-700"
+                            >
+                              ✨ Tailor Resume
+                            </button>
 
                             <button
                               onClick={() => {
@@ -931,34 +935,35 @@ const filteredJobs = safeJobs
                     );
                   })}
 
-                 {filteredJobs.length > jobsPerPage && (
-  <div className="mt-8 flex items-center justify-center gap-3">
-    <button
-      onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
-      disabled={currentPage === 1}
-      className="rounded-xl border border-white/10 px-5 py-3 disabled:opacity-40"
-    >
-      Prev
-    </button>
+                  {filteredJobs.length > jobsPerPage && (
+                    <div className="mt-8 flex items-center justify-center gap-3">
+                      <button
+                        onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
+                        disabled={currentPage === 1}
+                        className="rounded-xl border border-white/10 px-5 py-3 disabled:opacity-40"
+                      >
+                        Prev
+                      </button>
 
-    <span className="rounded-xl bg-white px-4 py-3 text-sm font-bold text-black">
-      {currentPage}
-    </span>
+                      <span className="rounded-xl bg-white px-4 py-3 text-sm font-bold text-black">
+                        {currentPage}
+                      </span>
 
-    <span className="text-sm text-gray-500">
-      of {totalPages}
-    </span>
+                      <span className="text-sm text-gray-500">
+                        of {totalPages}
+                      </span>
 
-    <button
-      onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
-      disabled={currentPage === totalPages}
-      className="rounded-xl border border-white/10 px-5 py-3 disabled:opacity-40"
-    >
-      Next
-    </button>
-  </div>
-)}
-                      
+                      <button
+                        onClick={() =>
+                          setCurrentPage((p) => Math.min(totalPages, p + 1))
+                        }
+                        disabled={currentPage === totalPages}
+                        className="rounded-xl border border-white/10 px-5 py-3 disabled:opacity-40"
+                      >
+                        Next
+                      </button>
+                    </div>
+                  )}
 
                   {filteredJobs.length === 0 && (
                     <div className="rounded-2xl border border-white/10 bg-white/5 p-10 text-center">
