@@ -38,8 +38,7 @@ export default function DashboardClient({
   const [category, setCategory] = useState("");
   const [risk, setRisk] = useState("");
   const [view, setView] = useState("all");
-  const [quickFilter, setQuickFilter] = useState("dashboard");
-
+const [quickFilter, setQuickFilter] = useState("archive");
   const [loading, setLoading] = useState(true);
   const [userEmail, setUserEmail] = useState("");
   const [userName, setUserName] = useState("");
@@ -344,7 +343,7 @@ export default function DashboardClient({
     setCategory("");
     setRisk("");
     setView("all");
-    setQuickFilter("dashboard");
+setQuickFilter("archive");
   }
 
   function resetOnlyFilters() {
