@@ -244,8 +244,12 @@ const [quickFilter, setQuickFilter] = useState("archive");
   }
 
   function getJobAgeGroup(job: any) {
-    const dateToCheck = job.first_seen_at || job.posted_at || job.created_at;
-
+const dateToCheck =
+  job.first_seen_at ||
+  job.last_seen_at ||
+  job.scraped_at ||
+  job.posted_at ||
+  job.created_at;
     if (!dateToCheck) return "old";
 
     const jobTime = new Date(dateToCheck).getTime();
