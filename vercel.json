@@ -3,6 +3,10 @@
     {
       "path": "/api/fetch-jobs?secret=optradar_secure_2026",
       "schedule": "0 */6 * * *"
+    },
+    {
+      "path": "/api/cleanup-jobs?secret=optradar_secure_2026",
+      "schedule": "30 2 * * *"
     }
   ]
 }
