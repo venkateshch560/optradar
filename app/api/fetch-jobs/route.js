@@ -43,16 +43,40 @@ function isAllowedRole(title = "") {
 function classify(text = "") {
   const lower = text.toLowerCase();
 
-  if (blockedWords.some((w) => lower.includes(w))) return null;
+  if (
+    lower.includes("u.s. citizen") ||
+    lower.includes("us citizen") ||
+    lower.includes("security clearance") ||
+    lower.includes("secret clearance") ||
+    lower.includes("top secret")
+  ) {
+    return null;
+  }
+
 
   if (
-    lower.includes("opt") ||
-    lower.includes("stem opt") ||
-    lower.includes("f-1") ||
-    lower.includes("cpt") ||
-    lower.includes("ead") ||
-    lower.includes("visa sponsorship") ||
+    lower.includes("will not sponsor") ||
+    lower.includes("does not sponsor") ||
+    lower.includes("without sponsorship") ||
+    lower.includes("no sponsorship")
+  ) {
+    return {
+      opt_status: "Not OPT Friendly",
+      opt_risk_level: "High Risk",
+      sponsorship_chance: "Low",
+      apply_confidence: 20,
+      opt_risk_reason:
+        "Employer indicates sponsorship restriction",
+    };
+  }
+
+
+  if (
     lower.includes("h-1b") ||
+    lower.includes("visa sponsorship") ||
+    lower.includes("stem opt") ||
+    lower.includes("opt") ||
+    lower.includes("f-1") ||
     lower.includes("e-verify")
   ) {
     return {
@@ -60,24 +84,21 @@ function classify(text = "") {
       opt_risk_level: "Low Risk",
       sponsorship_chance: "High",
       apply_confidence: 90,
-      opt_risk_reason: "",
+      opt_risk_reason:
+        "Positive immigration keywords found",
     };
   }
 
-  if (
-    lower.includes("no sponsorship") ||
-    lower.includes("without sponsorship") ||
-    lower.includes("no future sponsorship") ||
-    lower.includes("must be authorized")
-  ) {
-    return {
-      opt_status: "Apply Carefully",
-      opt_risk_level: "Medium Risk",
-      sponsorship_chance: "Medium",
-      apply_confidence: 70,
-      opt_risk_reason: "Sponsorship unclear",
-    };
-  }
+
+  return {
+    opt_status: "Review Needed",
+    opt_risk_level: "Medium Risk",
+    sponsorship_chance: "Unknown",
+    apply_confidence: 50,
+    opt_risk_reason:
+      "No sponsorship information found",
+  };
+}
 
   return {
     opt_status: "Possible OPT",
@@ -118,31 +139,58 @@ function roleCategory(title = "") {
   return "Other";
 }
 
-function experience(title = "") {
-  const t = title.toLowerCase();
+function experience(text = "") {
 
-  if (t.includes("intern") || t.includes("internship")) {
-    return { level: "Internship", years: 0 };
-  }
+ const t = text.toLowerCase();
 
-  if (
-    t.includes("junior") ||
-    t.includes("entry") ||
-    t.includes("associate") ||
-    t.includes("new grad")
-  ) {
-    return { level: "Entry Level", years: 0 };
-  }
 
-  if (t.includes("senior") || t.includes("sr.") || t.includes("principal")) {
-    return { level: "Senior", years: 6 };
-  }
+ const match =
+ t.match(/(\d+)\+?\s+years/) ||
+ t.match(/(\d+)\+?\s+yrs/);
 
-  if (t.includes("manager") || t.includes("lead") || t.includes("director")) {
-    return { level: "Lead / Manager", years: 8 };
-  }
 
-  return { level: "Experience not listed by employer", years: null };
+ if(match){
+
+ const yrs = Number(match[1]);
+
+ if(yrs <=2)
+ return {
+ level:"Entry Level",
+ years:yrs
+ };
+
+ if(yrs <=5)
+ return {
+ level:"Mid Level",
+ years:yrs
+ };
+
+ return {
+ level:"Senior",
+ years:yrs
+ };
+
+ }
+
+
+ if(
+ t.includes("intern") ||
+ t.includes("new grad") ||
+ t.includes("junior") ||
+ t.includes("associate")
+ ){
+ return {
+ level:"Entry Level",
+ years:0
+ };
+ }
+
+
+ return {
+ level:"Not specified",
+ years:null
+ };
+
 }
 
 function normalizeJob({
@@ -165,8 +213,9 @@ function normalizeJob({
   const opt = classify(`${cleanTitle} ${company} ${cleanLocation} ${cleanDescription}`);
   if (!opt) return null;
 
-  const exp = experience(cleanTitle);
-
+const exp = experience(
+ `${cleanTitle} ${cleanDescription}`
+);
   return {
     title: cleanTitle,
     company,
