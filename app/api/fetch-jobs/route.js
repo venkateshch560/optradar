@@ -17,13 +17,6 @@ const allowedRoles = [
   "bi developer", "reporting", "database", "etl"
 ];
 
-const blockedWords = [
-  "us citizen only", "u.s. citizen only", "u.s. citizens only",
-  "green card only", "permanent resident only", "security clearance",
-  "secret clearance", "top secret", "ts/sci", "public trust",
-  "us persons only", "u.s. persons only"
-];
-
 function jobHash(title, company, location, link) {
   return crypto
     .createHash("sha256")
@@ -43,78 +36,52 @@ function isAllowedRole(title = "") {
 function classify(text = "") {
   const lower = text.toLowerCase();
 
-  if (
-    lower.includes("u.s. citizen") ||
-    lower.includes("us citizen") ||
-    lower.includes("security clearance") ||
-    lower.includes("secret clearance") ||
-    lower.includes("top secret") ||
-    lower.includes("ts/sci") ||
-    lower.includes("public trust")
-  ) {
-    return null;
-  }
+  const blocked = [
+    "u.s. citizen", "us citizen", "u.s. citizens", "us citizens",
+    "security clearance", "secret clearance", "top secret", "ts/sci",
+    "public trust", "green card only", "permanent resident only",
+    "us persons only", "u.s. persons only", "must be a u.s. citizen",
+    "must be us citizen", "requires u.s. citizenship",
+    "requires us citizenship", "no sponsorship", "without sponsorship",
+    "will not sponsor", "does not sponsor", "no future sponsorship",
+    "unable to sponsor", "cannot sponsor"
+  ];
 
-  if (
-    lower.includes("will not sponsor") ||
-    lower.includes("does not sponsor") ||
-    lower.includes("without sponsorship") ||
-    lower.includes("no sponsorship") ||
-    lower.includes("no future sponsorship")
-  ) {
-    return {
-      opt_status: "Not OPT Friendly",
-      opt_risk_level: "High Risk",
-      sponsorship_chance: "Low",
-      apply_confidence: 20,
-      opt_risk_reason: "Employer indicates sponsorship restriction",
-    };
-  }
+  if (blocked.some((word) => lower.includes(word))) return null;
 
-  if (
-    lower.includes("h-1b") ||
-    lower.includes("visa sponsorship") ||
-    lower.includes("stem opt") ||
-    lower.includes("opt") ||
-    lower.includes("f-1") ||
-    lower.includes("e-verify")
-  ) {
+  const friendly = [
+    "visa sponsorship", "sponsorship available", "h-1b", "h1b",
+    "stem opt", "opt", "f-1", "cpt", "ead", "e-verify",
+    "new grad", "early career", "entry level"
+  ];
+
+  if (friendly.some((word) => lower.includes(word))) {
     return {
       opt_status: "OPT Friendly",
       opt_risk_level: "Low Risk",
       sponsorship_chance: "High",
       apply_confidence: 90,
-      opt_risk_reason: "Positive immigration keywords found",
+      opt_risk_reason: "Positive OPT/sponsorship or entry-level signals found",
     };
   }
 
   return {
-    opt_status: "Review Needed",
+    opt_status: "Review Required",
     opt_risk_level: "Medium Risk",
     sponsorship_chance: "Unknown",
     apply_confidence: 50,
-    opt_risk_reason: "No sponsorship information found",
+    opt_risk_reason: "No sponsorship restriction found, but sponsorship is not confirmed",
   };
 }
 
 function roleCategory(title = "") {
   const t = title.toLowerCase();
 
-  if (
-    t.includes("data") ||
-    t.includes("analyst") ||
-    t.includes("bi") ||
-    t.includes("sql") ||
-    t.includes("reporting")
-  ) {
+  if (t.includes("data") || t.includes("analyst") || t.includes("bi") || t.includes("sql") || t.includes("reporting")) {
     return "Data / Analytics";
   }
 
-  if (
-    t.includes("software") ||
-    t.includes("engineer") ||
-    t.includes("developer")
-  ) {
+  if (t.includes("software") || t.includes("engineer") || t.includes("developer")) {
     return "Software / Engineering";
   }
 
@@ -128,57 +95,45 @@ function roleCategory(title = "") {
 }
 
 function experience(text = "") {
+  const t = text.toLowerCase();
 
- const t = text.toLowerCase();
+  const match =
+    t.match(/(\d+)\+?\s+years/) ||
+    t.match(/(\d+)\+?\s+yrs/) ||
+    t.match(/minimum\s+of\s+(\d+)/);
 
+  if (match) {
+    const yrs = Number(match[1]);
+    if (yrs <= 2) return { level: "Entry Level", years: yrs };
+    if (yrs <= 5) return { level: "Mid Level", years: yrs };
+    return { level: "Senior", years: yrs };
+  }
 
- const match =
- t.match(/(\d+)\+?\s+years/) ||
- t.match(/(\d+)\+?\s+yrs/);
+  if (
+    t.includes("intern") ||
+    t.includes("internship") ||
+    t.includes("new grad") ||
+    t.includes("early career") ||
+    t.includes("junior") ||
+    t.includes("entry level") ||
+    t.includes("associate")
+  ) {
+    return { level: "Entry Level", years: 0 };
+  }
 
+  if (
+    t.includes("senior") ||
+    t.includes("sr.") ||
+    t.includes("principal") ||
+    t.includes("staff engineer") ||
+    t.includes("manager") ||
+    t.includes("lead") ||
+    t.includes("director")
+  ) {
+    return { level: "Senior", years: 6 };
+  }
 
- if(match){
-
- const yrs = Number(match[1]);
-
- if(yrs <=2)
- return {
- level:"Entry Level",
- years:yrs
- };
-
- if(yrs <=5)
- return {
- level:"Mid Level",
- years:yrs
- };
-
- return {
- level:"Senior",
- years:yrs
- };
-
- }
-
-
- if(
- t.includes("intern") ||
- t.includes("new grad") ||
- t.includes("junior") ||
- t.includes("associate")
- ){
- return {
- level:"Entry Level",
- years:0
- };
- }
-
-
- return {
- level:"Not specified",
- years:null
- };
-
+  return { level: "Not specified", years: null };
 }
 
 function normalizeJob({
@@ -198,12 +153,15 @@ function normalizeJob({
   if (!applyLink.startsWith("http")) return null;
   if (!isAllowedRole(cleanTitle)) return null;
 
-  const opt = classify(`${cleanTitle} ${company} ${cleanLocation} ${cleanDescription}`);
+  const fullText = `${cleanTitle} ${company} ${cleanLocation} ${cleanDescription}`;
+
+  const opt = classify(fullText);
   if (!opt) return null;
 
-const exp = experience(
- `${cleanTitle} ${cleanDescription}`
-);
+  const exp = experience(fullText);
+
+  if (exp.years !== null && exp.years >= 8) return null;
+
   return {
     title: cleanTitle,
     company,
@@ -327,7 +285,7 @@ async function fetchAshby(source) {
 
 async function fetchSmartRecruiters(source) {
   const res = await fetch(
-    `https://api.smartrecruiters.com/v1/companies/${source.ats_slug}/postings?limit=100`,
+    `https://api.smartrecruiters.com/v1/companies/${source.ats_slug}/postings?limit=25`,
     { cache: "no-store" }
   );
 
@@ -404,6 +362,11 @@ export async function GET(request) {
     return Response.json({ error: "Unauthorized" }, { status: 401 });
   }
 
+  const batch = Number(searchParams.get("batch") || 1);
+  const pageSize = 25;
+  const from = (batch - 1) * pageSize;
+  const to = from + pageSize - 1;
+
   const { data: sources, error: sourceError } = await supabase
     .from("company_sources")
     .select("*")
@@ -415,7 +378,7 @@ export async function GET(request) {
       "smartrecruiters",
       "workday",
     ])
-    .limit(150);
+    .range(from, to);
 
   if (sourceError) {
     return Response.json(
@@ -477,6 +440,7 @@ export async function GET(request) {
 
   return Response.json({
     success: true,
+    batch,
     totalSaved,
     sourcesChecked: sources?.length || 0,
     debug,
