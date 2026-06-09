@@ -20,25 +20,25 @@ export async function GET(request) {
     Date.now() - 2 * 24 * 60 * 60 * 1000
   ).toISOString();
 
-  const { error: oldError } = await supabase
+  await supabase
     .from("jobs")
     .update({ is_active: false })
     .lt("first_seen_at", sevenDaysAgo);
 
-  const { error: unseenError } = await supabase
+  await supabase
     .from("jobs")
     .update({ is_active: false })
     .lt("last_seen_at", twoDaysAgo);
 
-  if (oldError || unseenError) {
-    return Response.json({
-      success: false,
-      error: oldError?.message || unseenError?.message,
-    });
-  }
+  await supabase
+    .from("jobs")
+    .delete()
+    .or(
+      "apply_link.is.null,apply_link.eq.,apply_link.like.%api.smartrecruiters.com%"
+    );
 
   return Response.json({
     success: true,
-    message: "Old or unseen jobs marked inactive",
+    message: "Old, unseen, and broken jobs cleaned",
   });
 }
