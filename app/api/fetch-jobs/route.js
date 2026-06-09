@@ -13,26 +13,26 @@ const allowedRoles = [
   "data", "analyst", "business", "software", "engineer", "developer",
   "frontend", "backend", "full stack", "cloud", "devops", "qa",
   "support", "systems", "security", "product", "operations",
-  "machine learning", "ai", "sql", "power bi", "sap", "cyber"
+  "machine learning", "ai", "sql", "power bi", "sap", "cyber",
+  "bi developer", "reporting", "database", "etl"
 ];
 
 const blockedWords = [
-  "us citizen only",
-  "u.s. citizen only",
-  "green card only",
-  "permanent resident only",
-  "security clearance",
-  "top secret",
-  "ts/sci",
-  "public trust",
-  "us persons only"
+  "us citizen only", "u.s. citizen only", "u.s. citizens only",
+  "green card only", "permanent resident only", "security clearance",
+  "secret clearance", "top secret", "ts/sci", "public trust",
+  "us persons only", "u.s. persons only"
 ];
 
 function jobHash(title, company, location, link) {
   return crypto
     .createHash("sha256")
-    .update(`${title}|${company}|${location}|${link}`.toLowerCase())
+    .update(`${title}|${company}|${location}|${link}`.toLowerCase().trim())
     .digest("hex");
+}
+
+function cleanText(value = "") {
+  return String(value).replace(/<[^>]*>/g, " ").replace(/\s+/g, " ").trim();
 }
 
 function isAllowedRole(title = "") {
@@ -60,13 +60,14 @@ function classify(text = "") {
       opt_risk_level: "Low Risk",
       sponsorship_chance: "High",
       apply_confidence: 90,
-      opt_risk_reason: ""
+      opt_risk_reason: "",
     };
   }
 
   if (
     lower.includes("no sponsorship") ||
     lower.includes("without sponsorship") ||
+    lower.includes("no future sponsorship") ||
     lower.includes("must be authorized")
   ) {
     return {
@@ -74,7 +75,7 @@ function classify(text = "") {
       opt_risk_level: "Medium Risk",
       sponsorship_chance: "Medium",
       apply_confidence: 70,
-      opt_risk_reason: "Sponsorship unclear"
+      opt_risk_reason: "Sponsorship unclear",
     };
   }
 
@@ -83,18 +84,28 @@ function classify(text = "") {
     opt_risk_level: "Medium Risk",
     sponsorship_chance: "Medium",
     apply_confidence: 80,
-    opt_risk_reason: "No clear OPT/sponsorship language"
+    opt_risk_reason: "No clear OPT/sponsorship language",
   };
 }
 
 function roleCategory(title = "") {
   const t = title.toLowerCase();
 
-  if (t.includes("data") || t.includes("analyst") || t.includes("bi") || t.includes("sql")) {
+  if (
+    t.includes("data") ||
+    t.includes("analyst") ||
+    t.includes("bi") ||
+    t.includes("sql") ||
+    t.includes("reporting")
+  ) {
     return "Data / Analytics";
   }
 
-  if (t.includes("software") || t.includes("engineer") || t.includes("developer")) {
+  if (
+    t.includes("software") ||
+    t.includes("engineer") ||
+    t.includes("developer")
+  ) {
     return "Software / Engineering";
   }
 
@@ -110,7 +121,16 @@ function roleCategory(title = "") {
 function experience(title = "") {
   const t = title.toLowerCase();
 
-  if (t.includes("junior") || t.includes("entry") || t.includes("associate") || t.includes("new grad")) {
+  if (t.includes("intern") || t.includes("internship")) {
+    return { level: "Internship", years: 0 };
+  }
+
+  if (
+    t.includes("junior") ||
+    t.includes("entry") ||
+    t.includes("associate") ||
+    t.includes("new grad")
+  ) {
     return { level: "Entry Level", years: 0 };
   }
 
@@ -132,28 +152,32 @@ function normalizeJob({
   description,
   applyLink,
   source,
-  postedAt
+  postedAt,
 }) {
-  if (!title || !applyLink) return null;
-  if (!isAllowedRole(title)) return null;
+  const cleanTitle = cleanText(title);
+  const cleanDescription = cleanText(description);
+  const cleanLocation = cleanText(location || "United States");
 
-  const opt = classify(`${title} ${company} ${location} ${description}`);
+  if (!cleanTitle || !applyLink) return null;
+  if (!applyLink.startsWith("http")) return null;
+  if (!isAllowedRole(cleanTitle)) return null;
+
+  const opt = classify(`${cleanTitle} ${company} ${cleanLocation} ${cleanDescription}`);
   if (!opt) return null;
 
-  const exp = experience(title);
+  const exp = experience(cleanTitle);
 
   return {
-    title,
+    title: cleanTitle,
     company,
-    location: location || "United States",
-    description: description || "",
-    full_page_text: description || "",
+    location: cleanLocation,
+    description: cleanDescription,
+    full_page_text: cleanDescription,
     apply_link: applyLink,
     apply_url: applyLink,
-    job_hash: jobHash(title, company, location || "United States", applyLink),
+    job_hash: jobHash(cleanTitle, company, cleanLocation, applyLink),
     source,
     posted_at: postedAt || new Date().toISOString(),
-    first_seen_at: new Date().toISOString(),
     last_seen_at: new Date().toISOString(),
     opt_status: opt.opt_status,
     opt_risk_level: opt.opt_risk_level,
@@ -166,18 +190,18 @@ function normalizeJob({
     is_fresh: true,
     is_active: true,
     remote:
-      title.toLowerCase().includes("remote") ||
-      (location || "").toLowerCase().includes("remote"),
+      cleanTitle.toLowerCase().includes("remote") ||
+      cleanLocation.toLowerCase().includes("remote"),
     salary: "",
     scraped_at: new Date().toISOString(),
     is_direct_employer: true,
     source_type: "direct_employer_career_site",
     excluded_reason: "",
     freshness_label: "Fresh",
-    role_category: roleCategory(title),
+    role_category: roleCategory(cleanTitle),
     apply_ease: "Direct Apply",
     ats_platform: source,
-    company_domain: ""
+    company_domain: "",
   };
 }
 
@@ -201,7 +225,7 @@ async function fetchGreenhouse(source) {
         description: job.content || "",
         applyLink: job.absolute_url,
         source: "Greenhouse",
-        postedAt: job.updated_at
+        postedAt: job.updated_at,
       })
     )
     .filter(Boolean);
@@ -226,9 +250,9 @@ async function fetchLever(source) {
         company: source.company_name,
         location: job.categories?.location || "United States",
         description: job.descriptionPlain || job.description || "",
-        applyLink: job.hostedUrl,
+        applyLink: job.hostedUrl || job.applyUrl,
         source: "Lever",
-        postedAt: job.createdAt ? new Date(job.createdAt).toISOString() : null
+        postedAt: job.createdAt ? new Date(job.createdAt).toISOString() : null,
       })
     )
     .filter(Boolean);
@@ -254,9 +278,9 @@ async function fetchAshby(source) {
         company: source.company_name,
         location: job.location || "United States",
         description: job.descriptionPlain || job.descriptionHtml || "",
-        applyLink: job.jobUrl,
+        applyLink: job.jobUrl || job.applyUrl,
         source: "Ashby",
-        postedAt: job.publishedAt
+        postedAt: job.publishedAt || job.updatedAt,
       })
     )
     .filter(Boolean);
@@ -270,26 +294,53 @@ async function fetchSmartRecruiters(source) {
     { cache: "no-store" }
   );
 
-  if (!res.ok) return { rows: [], found: 0, error: `SmartRecruiters ${res.status}` };
+  if (!res.ok) {
+    return { rows: [], found: 0, error: `SmartRecruiters ${res.status}` };
+  }
 
   const data = await res.json();
   const jobs = data.content || [];
 
   const rows = jobs
-    .map((job) =>
-      normalizeJob({
+    .map((job) => {
+      const applyLink =
+        job.applyUrl ||
+        job.postingUrl ||
+        (job.id
+          ? `https://jobs.smartrecruiters.com/${source.ats_slug}/${job.id}`
+          : "");
+
+      return normalizeJob({
         title: job.name,
         company: source.company_name,
-        location: job.location?.city || job.location?.country || "United States",
-        description: job.refNumber || "",
-        applyLink: job.ref,
+        location:
+          job.location?.city ||
+          job.location?.region ||
+          job.location?.country ||
+          "United States",
+        description: job.refNumber || job.name || "",
+        applyLink,
         source: "SmartRecruiters",
-        postedAt: job.releasedDate
-      })
-    )
+        postedAt: job.releasedDate,
+      });
+    })
     .filter(Boolean);
 
   return { rows, found: jobs.length };
+}
+
+async function saveRows(rows) {
+  if (!rows.length) return { saved: 0, error: null };
+
+  const uniqueRows = Array.from(
+    new Map(rows.map((row) => [row.job_hash, row])).values()
+  );
+
+  const { error } = await supabase.from("jobs").upsert(uniqueRows, {
+    onConflict: "job_hash",
+  });
+
+  return { saved: error ? 0 : uniqueRows.length, error };
 }
 
 export async function GET(request) {
@@ -300,14 +351,23 @@ export async function GET(request) {
   }
 
   const { data: sources, error: sourceError } = await supabase
-   .from("company_sources")
-.select("*")
-.eq("active", true)
-.not("careers_url", "is", null)
-.limit(100);
+    .from("company_sources")
+    .select("*")
+    .eq("active", true)
+    .in("ats_platform", [
+      "greenhouse",
+      "lever",
+      "ashby",
+      "smartrecruiters",
+      "workday",
+    ])
+    .limit(150);
 
   if (sourceError) {
-    return Response.json({ success: false, error: sourceError.message }, { status: 500 });
+    return Response.json(
+      { success: false, error: sourceError.message },
+      { status: 500 }
+    );
   }
 
   let totalSaved = 0;
@@ -317,60 +377,38 @@ export async function GET(request) {
     let result = { rows: [], found: 0 };
 
     try {
-      if (source.ats_platform === "greenhouse") result = await fetchGreenhouse(source);
-      else if (source.ats_platform === "lever") result = await fetchLever(source);
-      else if (source.ats_platform === "ashby") result = await fetchAshby(source);
-      else if (source.ats_platform === "smartrecruiters") result = await fetchSmartRecruiters(source);
-            else if (source.ats_platform === "workday") {
-      result = await fetchWorkday(source);
-    }
-      else {
-        debug.push({
-          company: source.company_name,
-          ats: source.ats_platform,
-          saved: 0,
-          error: "ATS not supported yet"
-        });
-        continue;
+      if (source.ats_platform === "greenhouse") {
+        result = await fetchGreenhouse(source);
+      } else if (source.ats_platform === "lever") {
+        result = await fetchLever(source);
+      } else if (source.ats_platform === "ashby") {
+        result = await fetchAshby(source);
+      } else if (source.ats_platform === "smartrecruiters") {
+        result = await fetchSmartRecruiters(source);
+      } else if (source.ats_platform === "workday") {
+        result = await fetchWorkday(source);
       }
 
-      const uniqueRows = Array.from(
-        new Map(result.rows.map((row) => [row.job_hash, row])).values()
-      );
+      const save = await saveRows(result.rows || []);
 
-      if (uniqueRows.length > 0) {
-        const { error } = await supabase.from("jobs").upsert(uniqueRows, {
-          onConflict: "job_hash",
-          ignoreDuplicates: true
-        });
-
-        if (error) {
-          debug.push({
-            company: source.company_name,
-            ats: source.ats_platform,
-            found: result.found,
-            prepared: uniqueRows.length,
-            saved: 0,
-            error: error.message
-          });
-        } else {
-          totalSaved += uniqueRows.length;
-          debug.push({
-            company: source.company_name,
-            ats: source.ats_platform,
-            found: result.found,
-            prepared: uniqueRows.length,
-            saved: uniqueRows.length
-          });
-        }
-      } else {
+      if (save.error) {
         debug.push({
           company: source.company_name,
           ats: source.ats_platform,
           found: result.found,
-          prepared: 0,
+          prepared: result.rows?.length || 0,
           saved: 0,
-          error: result.error || null
+          error: save.error.message,
+        });
+      } else {
+        totalSaved += save.saved;
+        debug.push({
+          company: source.company_name,
+          ats: source.ats_platform,
+          found: result.found,
+          prepared: result.rows?.length || 0,
+          saved: save.saved,
+          error: result.error || null,
         });
       }
     } catch (err) {
@@ -378,7 +416,7 @@ export async function GET(request) {
         company: source.company_name,
         ats: source.ats_platform,
         saved: 0,
-        error: err.message
+        error: err.message,
       });
     }
   }
@@ -387,6 +425,6 @@ export async function GET(request) {
     success: true,
     totalSaved,
     sourcesChecked: sources?.length || 0,
-    debug
+    debug,
   });
 }
