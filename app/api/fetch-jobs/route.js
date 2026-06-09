@@ -48,28 +48,28 @@ function classify(text = "") {
     lower.includes("us citizen") ||
     lower.includes("security clearance") ||
     lower.includes("secret clearance") ||
-    lower.includes("top secret")
+    lower.includes("top secret") ||
+    lower.includes("ts/sci") ||
+    lower.includes("public trust")
   ) {
     return null;
   }
-
 
   if (
     lower.includes("will not sponsor") ||
     lower.includes("does not sponsor") ||
     lower.includes("without sponsorship") ||
-    lower.includes("no sponsorship")
+    lower.includes("no sponsorship") ||
+    lower.includes("no future sponsorship")
   ) {
     return {
       opt_status: "Not OPT Friendly",
       opt_risk_level: "High Risk",
       sponsorship_chance: "Low",
       apply_confidence: 20,
-      opt_risk_reason:
-        "Employer indicates sponsorship restriction",
+      opt_risk_reason: "Employer indicates sponsorship restriction",
     };
   }
-
 
   if (
     lower.includes("h-1b") ||
@@ -84,28 +84,16 @@ function classify(text = "") {
       opt_risk_level: "Low Risk",
       sponsorship_chance: "High",
       apply_confidence: 90,
-      opt_risk_reason:
-        "Positive immigration keywords found",
+      opt_risk_reason: "Positive immigration keywords found",
     };
   }
-
 
   return {
     opt_status: "Review Needed",
     opt_risk_level: "Medium Risk",
     sponsorship_chance: "Unknown",
     apply_confidence: 50,
-    opt_risk_reason:
-      "No sponsorship information found",
-  };
-}
-
-  return {
-    opt_status: "Possible OPT",
-    opt_risk_level: "Medium Risk",
-    sponsorship_chance: "Medium",
-    apply_confidence: 80,
-    opt_risk_reason: "No clear OPT/sponsorship language",
+    opt_risk_reason: "No sponsorship information found",
   };
 }
 
