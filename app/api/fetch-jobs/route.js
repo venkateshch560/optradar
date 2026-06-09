@@ -348,18 +348,28 @@ async function fetchSmartRecruiters(source) {
   }
 
   const data = await res.json();
-  const jobs = data.content || [];
+  const rows = [];
 
-  const rows = jobs
-    .map((job) => {
-      const applyLink =
-        job.applyUrl ||
-        job.postingUrl ||
-        (job.id
-          ? `https://jobs.smartrecruiters.com/${source.ats_slug}/${job.id}`
-          : "");
+  for (const item of data.content || []) {
+    try {
+      if (!item.id) continue;
 
-      return normalizeJob({
+      const detailRes = await fetch(
+        `https://api.smartrecruiters.com/v1/companies/${source.ats_slug}/postings/${item.id}`,
+        { cache: "no-store" }
+      );
+
+      if (!detailRes.ok) continue;
+
+      const job = await detailRes.json();
+
+      const description = `
+        ${job.jobAd?.sections?.jobDescription?.text || ""}
+        ${job.jobAd?.sections?.qualifications?.text || ""}
+        ${job.jobAd?.sections?.additionalInformation?.text || ""}
+      `;
+
+      const row = normalizeJob({
         title: job.name,
         company: source.company_name,
         location:
@@ -367,15 +377,22 @@ async function fetchSmartRecruiters(source) {
           job.location?.region ||
           job.location?.country ||
           "United States",
-        description: job.refNumber || job.name || "",
-        applyLink,
+        description,
+        applyLink: job.applyUrl || job.postingUrl || "",
         source: "SmartRecruiters",
         postedAt: job.releasedDate,
       });
-    })
-    .filter(Boolean);
 
-  return { rows, found: jobs.length };
+      if (row) rows.push(row);
+    } catch (err) {
+      continue;
+    }
+  }
+
+  return {
+    rows,
+    found: rows.length,
+  };
 }
 
 async function saveRows(rows) {
